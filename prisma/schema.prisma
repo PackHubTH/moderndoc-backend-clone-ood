@@ -1,11 +1,311 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "cockroachdb"
   url      = env("DATABASE_URL")
+}
+
+model Faculty {
+  id          BigInt       @id @default(autoincrement())
+  name        String       @unique
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  departments Department[]
+
+  @@map("faculty")
+}
+
+model Department {
+  id                 BigInt              @id @default(autoincrement())
+  name               String              @unique
+  type               DepartmentType
+  facultyId          BigInt?             @map("faculty_id")
+  courses            Course[]
+  faculty            Faculty?            @relation(fields: [facultyId], references: [id])
+  staffDepartments   StaffDepartment[]
+  teacherDepartments TeacherDepartment[]
+  templates          Template[]
+
+  @@map("department")
+}
+
+model Course {
+  id           BigInt     @id @default(autoincrement())
+  name         String     @unique
+  departmentId BigInt     @map("department_id")
+  department   Department @relation(fields: [departmentId], references: [id])
+  students     Student[]
+  teachers     Teacher[]
+
+  @@map("course")
+}
+
+model User {
+  id                   BigInt             @id @default(autoincrement())
+  firstName            String             @map("first_name")
+  lastName             String             @map("last_name")
+  role                 Role
+  emails               String[]           @unique @map("email")
+  defaultEmailIndex    Int                @default(0) @map("default_email_index")
+  phones               String[]           @map("phone")
+  defaultPhoneIndex    Int                @default(0) @map("default_phone_index")
+  profileImg           String?            @map("profile_img")
+  signatures           String[]           @map("signature")
+  notificationConfig   Json               @map("notification_config")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  userCreatedDocuments Document[]         @relation("user_created_document")
+  userUpdatedDocuments Document[]         @relation("user_update_document")
+  documentSents        DocumentSent[]
+  documentTimelines    DocumentTimeline[]
+  userCreatedFaqs      Faq[]              @relation("user_created_faq")
+  userUpdatedFaqs      Faq[]              @relation("user_updated_faq")
+  staff                Staff[]
+  students             Student[]
+  userCreatedSubFaqs   SubFaq[]           @relation("user_created_sub_faq")
+  userUpdatedSubFaqs   SubFaq[]           @relation("user_updated_sub_faq")
+  teachers             Teacher[]
+  userCreatedTemplates Template[]         @relation("user_created_template")
+  userUpdatedTemplates Template[]         @relation("user_updated_template")
+  userGroups           UserGroup[]
+
+  @@map("user")
+}
+
+model Student {
+  id            BigInt   @id @default(autoincrement())
+  userId        BigInt   @map("user_id")
+  courseId      BigInt   @map("course_id")
+  advisorId     BigInt?  @map("advisor_id")
+  studentNumber String   @unique @map("student_number")
+  isApproved    Boolean  @default(false) @map("is_approved")
+  advisor       Teacher? @relation(fields: [advisorId], references: [id])
+  course        Course   @relation(fields: [courseId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@map("student")
+}
+
+model Teacher {
+  id                 BigInt              @id @default(autoincrement())
+  userId             BigInt              @map("user_id")
+  courseId           BigInt              @map("course_id")
+  staffNumber        String              @unique @map("staff_number")
+  isApproved         Boolean             @default(false) @map("is_approved")
+  students           Student[]
+  course             Course              @relation(fields: [courseId], references: [id])
+  user               User                @relation(fields: [userId], references: [id])
+  teacherDepartments TeacherDepartment[]
+
+  @@map("teacher")
+}
+
+model TeacherDepartment {
+  id           BigInt     @id @default(autoincrement())
+  teacherId    BigInt     @map("teacher_id")
+  departmentId BigInt     @map("department_id")
+  department   Department @relation(fields: [departmentId], references: [id])
+  teacher      Teacher    @relation(fields: [teacherId], references: [id])
+
+  @@map("teacher_department")
+}
+
+model Staff {
+  id               BigInt            @id @default(autoincrement())
+  userId           BigInt            @map("user_id")
+  staffNumber      String            @unique @map("staff_number")
+  type             StaffType
+  isApproved       Boolean           @default(false) @map("is_approved")
+  user             User              @relation(fields: [userId], references: [id])
+  staffDepartments StaffDepartment[]
+
+  @@map("staff")
+}
+
+model StaffDepartment {
+  id           BigInt     @id @default(autoincrement())
+  staffId      BigInt     @map("staff_id")
+  departmentId BigInt     @map("department_id")
+  department   Department @relation(fields: [departmentId], references: [id])
+  staff        Staff      @relation(fields: [staffId], references: [id])
+
+  @@map("staff_department")
+}
+
+model Faq {
+  id            BigInt    @id @default(autoincrement())
+  templateId    BigInt?   @map("template_id")
+  title         String
+  documentCode  String    @map("document_code")
+  description   String
+  guideline     String
+  extraContact  String    @map("extra_contact")
+  file          String
+  isInternal    Boolean   @map("is_internal")
+  createdBy     BigInt    @map("created_by")
+  updatedBy     BigInt    @map("updated_by")
+  lastUpdatedAt DateTime  @updatedAt @map("last_updated_at")
+  userCreated   User      @relation("user_created_faq", fields: [createdBy], references: [id])
+  template      Template? @relation(fields: [templateId], references: [id])
+  userUpdated   User      @relation("user_updated_faq", fields: [updatedBy], references: [id])
+  faqTags       FaqTag[]
+  subFaqs       SubFaq[]
+
+  @@map("faq")
+}
+
+model SubFaq {
+  id            BigInt   @id @default(autoincrement())
+  faqId         BigInt   @map("faq_id")
+  title         String
+  description   String
+  isInternal    Boolean  @map("is_internal")
+  createdBy     BigInt   @map("created_by")
+  updatedBy     BigInt   @map("updated_by")
+  lastUpdatedAt DateTime @updatedAt @map("last_updated_at")
+  userCreated   User     @relation("user_created_sub_faq", fields: [createdBy], references: [id])
+  faq           Faq      @relation(fields: [faqId], references: [id])
+  userUpdated   User     @relation("user_updated_sub_faq", fields: [updatedBy], references: [id])
+
+  @@map("sub_faq")
+}
+
+model Template {
+  id             BigInt          @id @default(autoincrement())
+  departmentId   BigInt          @map("department_id")
+  title          String
+  templateFile   String          @map("template_file")
+  exampleFile    String          @map("example_file")
+  description    String
+  createdBy      BigInt          @map("created_by")
+  updatedBy      BigInt          @map("updated_by")
+  lastUpdatedAt  DateTime        @updatedAt @map("last_updated_at")
+  faqs           Faq[]
+  userCreated    User            @relation("user_created_template", fields: [createdBy], references: [id])
+  department     Department      @relation(fields: [departmentId], references: [id])
+  userUpdated    User            @relation("user_updated_template", fields: [updatedBy], references: [id])
+  templateGroups TemplateGroup[]
+
+  @@map("template")
+}
+
+model Group {
+  id             BigInt          @id @default(autoincrement())
+  name           String          @unique
+  isInternal     Boolean         @map("is_internal")
+  templateGroups TemplateGroup[]
+  userGroups     UserGroup[]
+
+  @@map("group")
+}
+
+model UserGroup {
+  userId  BigInt @map("user_id")
+  groupId BigInt @map("group_id")
+  group   Group  @relation(fields: [groupId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+
+  @@id([userId, groupId])
+  @@map("user_group")
+}
+
+model TemplateGroup {
+  templateId BigInt   @map("template_id")
+  groupId    BigInt   @map("group_id")
+  group      Group    @relation(fields: [groupId], references: [id])
+  template   Template @relation(fields: [templateId], references: [id])
+
+  @@id([templateId, groupId])
+  @@map("template_group")
+}
+
+model Tag {
+  id      BigInt   @id @default(autoincrement())
+  name    String   @unique
+  faqTags FaqTag[]
+
+  @@map("tag")
+}
+
+model FaqTag {
+  faqId BigInt @map("faq_id")
+  tagId BigInt @map("tag_id")
+  faq   Faq    @relation(fields: [faqId], references: [id])
+  tag   Tag    @relation(fields: [tagId], references: [id])
+
+  @@id([faqId, tagId])
+  @@map("faq_tag")
+}
+
+model Document {
+  id                BigInt             @id @default(autoincrement())
+  title             String
+  templateFile      String             @map("template_file")
+  exampleFile       String             @map("example_file")
+  element           Json
+  status            DocumentStatus
+  createdBy         BigInt             @map("created_by")
+  updatedBy         BigInt             @map("updated_by")
+  lastUpdatedAt     DateTime           @updatedAt @map("last_updated_at")
+  userCreated       User               @relation("user_created_document", fields: [createdBy], references: [id])
+  userUpdated       User               @relation("user_update_document", fields: [updatedBy], references: [id])
+  documentSents     DocumentSent[]
+  documentTimelines DocumentTimeline[]
+
+  @@map("document")
+}
+
+model DocumentTimeline {
+  documentId    BigInt   @map("document_id")
+  message       String
+  updatedBy     BigInt   @map("updated_by")
+  createdAt     DateTime @default(now()) @map("created_at")
+  document      Document @relation(fields: [documentId], references: [id])
+  userUpdatedBy User     @relation(fields: [updatedBy], references: [id])
+
+  @@id([documentId, updatedBy])
+  @@map("document_timeline")
+}
+
+model DocumentSent {
+  documentId BigInt         @map("document_id")
+  receiverId BigInt         @map("receiver_id")
+  message    String
+  isEditable Boolean        @map("is_editable")
+  status     DocumentStatus
+  sendAt     DateTime       @default(now()) @map("send_at")
+  document   Document       @relation(fields: [documentId], references: [id])
+  receiver   User           @relation(fields: [receiverId], references: [id])
+
+  @@id([documentId, receiverId, sendAt])
+  @@map("document_sent")
+}
+
+enum DepartmentType {
+  DOG
+  CAT
+
+  @@map("department_type")
+}
+
+enum Role {
+  USER
+  ADMIN
+
+  @@map("role")
+}
+
+enum StaffType {
+  STAFF
+  ADMIN
+
+  @@map("staff_type")
+}
+
+enum DocumentStatus {
+  DRAFT
+  PUBLISHED
+
+  @@map("document_status")
 }
