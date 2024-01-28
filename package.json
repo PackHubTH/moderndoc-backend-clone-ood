@@ -8,7 +8,8 @@
     "build": "bun run tsc",
     "start": "bun dist/index.js",
     "dev": "bun --hot index.ts",
-    "db:pull": "prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate"
+    "db:pull": "prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate",
+    "db:push": "prisma migrate dev --name migrate && prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate"
   },
   "keywords": [],
   "author": "Apicha On-amphai",

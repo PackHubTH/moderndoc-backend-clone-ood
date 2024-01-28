@@ -37,15 +37,12 @@ model Course {
   departmentId BigInt     @map("department_id")
   department   Department @relation(fields: [departmentId], references: [id])
   students     Student[]
-  teachers     Teacher[]
 
   @@map("course")
 }
 
 model User {
   id                   BigInt             @id @default(autoincrement())
-  firstName            String             @map("first_name")
-  lastName             String             @map("last_name")
   role                 Role
   emails               String[]           @unique @map("email")
   defaultEmailIndex    Int                @default(0) @map("default_email_index")
@@ -53,8 +50,10 @@ model User {
   defaultPhoneIndex    Int                @default(0) @map("default_phone_index")
   profileImg           String?            @map("profile_img")
   signatures           String[]           @map("signature")
-  notificationConfig   Json               @map("notification_config")
+  notificationConfig   Json               @default("{}") @map("notification_config")
   createdAt            DateTime           @default(now()) @map("created_at")
+  nameEn               String             @map("nameEN")
+  nameTh               String             @map("nameTH")
   userCreatedDocuments Document[]         @relation("user_created_document")
   userUpdatedDocuments Document[]         @relation("user_update_document")
   documentSents        DocumentSent[]
@@ -90,11 +89,8 @@ model Student {
 model Teacher {
   id                 BigInt              @id @default(autoincrement())
   userId             BigInt              @map("user_id")
-  courseId           BigInt              @map("course_id")
   staffNumber        String              @unique @map("staff_number")
-  isApproved         Boolean             @default(false) @map("is_approved")
   students           Student[]
-  course             Course              @relation(fields: [courseId], references: [id])
   user               User                @relation(fields: [userId], references: [id])
   teacherDepartments TeacherDepartment[]
 
@@ -105,6 +101,7 @@ model TeacherDepartment {
   id           BigInt     @id @default(autoincrement())
   teacherId    BigInt     @map("teacher_id")
   departmentId BigInt     @map("department_id")
+  isApproved   Boolean    @default(false) @map("is_approved")
   department   Department @relation(fields: [departmentId], references: [id])
   teacher      Teacher    @relation(fields: [teacherId], references: [id])
 
@@ -116,7 +113,6 @@ model Staff {
   userId           BigInt            @map("user_id")
   staffNumber      String            @unique @map("staff_number")
   type             StaffType
-  isApproved       Boolean           @default(false) @map("is_approved")
   user             User              @relation(fields: [userId], references: [id])
   staffDepartments StaffDepartment[]
 
@@ -127,6 +123,7 @@ model StaffDepartment {
   id           BigInt     @id @default(autoincrement())
   staffId      BigInt     @map("staff_id")
   departmentId BigInt     @map("department_id")
+  isApproved   Boolean    @default(false) @map("is_approved")
   department   Department @relation(fields: [departmentId], references: [id])
   staff        Staff      @relation(fields: [staffId], references: [id])
 
@@ -290,8 +287,9 @@ enum DepartmentType {
 }
 
 enum Role {
-  USER
   ADMIN
+  STUDENT
+  STAFF
 
   @@map("role")
 }

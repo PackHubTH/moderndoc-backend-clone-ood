@@ -1,10 +1,9 @@
-import Router from 'express'
+import { Router } from 'express'
 
-const tag = Router()
+import userRoutes from './userRoutes'
 
-// tag.post('/',createTag)
-// tag.put('/',updateTag)
-// tag.delete('/',deleteTag)
-// tag.get('/',getAllTags)
+const routes = Router()
 
-export default tag
+routes.use('/user', userRoutes)
+
+export default routes
