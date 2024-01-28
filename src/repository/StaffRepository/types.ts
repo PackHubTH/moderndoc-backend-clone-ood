@@ -1,6 +1,6 @@
 import { StaffType } from '@prisma/client'
 
-export type addStaffParams = {
+export type AddStaffParams = {
   userId: bigint
   departmentIds: bigint[]
   staffNumber: string

@@ -1,8 +1,12 @@
+import {
+  getAllAgencyDepartments,
+  getDepartmentsByFacultyId,
+} from 'controllers/DepartmentController'
 import Router from 'express'
 
 const department = Router()
 
-// department.get('/',getAllDepartments)
-// department.get('/faculty/:id',getDepartmentByFacultyId)
+department.get('/', getAllAgencyDepartments)
+department.get('/faculty/:facultyId', getDepartmentsByFacultyId)
 
 export default department

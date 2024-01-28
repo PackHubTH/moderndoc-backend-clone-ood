@@ -1,9 +1,9 @@
 import Prisma from '@prisma'
 import type { Staff } from '@prisma/client'
 
-import { addStaffParams } from './types'
+import { AddStaffParams } from './types'
 
-export const addStaff = async (staff: addStaffParams): Promise<Staff> => {
+export const addStaff = async (staff: AddStaffParams): Promise<Staff> => {
   const newStaff = await Prisma.staff.create({
     data: {
       staffNumber: staff.staffNumber,

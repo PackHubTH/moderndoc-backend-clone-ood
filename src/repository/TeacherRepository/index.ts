@@ -1,10 +1,10 @@
 import Prisma from '@prisma'
 import type { Teacher } from '@prisma/client'
 
-import { addTeacherParams } from './types'
+import { AddTeacherParams } from './types'
 
 export const addTeacher = async (
-  teacher: addTeacherParams
+  teacher: AddTeacherParams
 ): Promise<Teacher> => {
   const newTeacher = await Prisma.teacher.create({
     data: {

@@ -1,4 +1,4 @@
-export type addStudentParams = {
+export type AddStudentParams = {
   userId: bigint
   courseId: bigint
   studentNumber: string

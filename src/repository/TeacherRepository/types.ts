@@ -1,4 +1,4 @@
-export type addTeacherParams = {
+export type AddTeacherParams = {
   userId: bigint
   departmentIds: bigint[]
   staffNumber: string

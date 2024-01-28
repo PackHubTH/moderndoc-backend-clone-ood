@@ -138,7 +138,7 @@ model Faq {
   description   String
   guideline     String
   extraContact  String    @map("extra_contact")
-  file          String
+  file          String?
   isInternal    Boolean   @map("is_internal")
   createdBy     BigInt    @map("created_by")
   updatedBy     BigInt    @map("updated_by")
