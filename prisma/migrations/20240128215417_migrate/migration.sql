@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "faq" ALTER COLUMN "file" DROP NOT NULL;
