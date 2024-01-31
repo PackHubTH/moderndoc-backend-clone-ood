@@ -12,7 +12,7 @@ export const createTag = async (name: string): Promise<Tag> => {
 }
 
 export const changeTagName = async (
-  tagId: bigint,
+  tagId: string,
   name: string
 ): Promise<Tag> => {
   const newTag = await prisma.tag.update({
@@ -27,7 +27,7 @@ export const changeTagName = async (
   return newTag
 }
 
-export const deleteTag = async (tagId: bigint): Promise<Tag> => {
+export const deleteTag = async (tagId: string): Promise<Tag> => {
   const newTag = await prisma.tag.delete({
     where: {
       id: tagId,

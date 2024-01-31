@@ -10,9 +10,8 @@ export const getCoursesByDepartmentId = async (req: Request, res: Response) => {
   try {
     const { departmentId } =
       await getCoursesByDepartmentIdRequestSchema.parseAsync(req.params)
-    const courses = await CourseRepository.getCoursesByDepartmentId(
-      BigInt(departmentId)
-    )
+    const courses =
+      await CourseRepository.getCoursesByDepartmentId(departmentId)
 
     const response: ApiResponse<Course[]> = {
       data: courses,

@@ -7,7 +7,7 @@ export const addStaff = async (
   params: RegisterStaffSchema
 ): Promise<Staff> => {
   const newUser = await addUser({
-    email: params.email,
+    emails: params.email,
     nameEn: params.nameEn,
     nameTh: params.nameTh,
     phone: params.phone,

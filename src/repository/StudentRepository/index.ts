@@ -6,8 +6,18 @@ import { AddStudentParams } from './types'
 export const addStudent = async (
   student: AddStudentParams
 ): Promise<Student> => {
+  const { userId, studentNumber, courseId } = student
+  console.log({
+    studentNumber,
+    userId,
+    courseId,
+  })
   const newStudent = await Prisma.student.create({
-    data: student,
+    data: {
+      studentNumber,
+      courseId,
+      userId,
+    },
   })
 
   return newStudent

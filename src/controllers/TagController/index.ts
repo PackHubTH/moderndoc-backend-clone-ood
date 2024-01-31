@@ -37,7 +37,7 @@ export const updateTag = async (req: Request, res: Response) => {
   try {
     const { tagId, name } = await updateTagRequestSchema.parseAsync(req.body)
 
-    const tag = await TagRepository.changeTagName(BigInt(tagId), name)
+    const tag = await TagRepository.changeTagName(string(tagId), name)
 
     const response: ApiResponse<Tag> = {
       data: tag,
@@ -60,7 +60,7 @@ export const deleteTag = async (req: Request, res: Response) => {
   try {
     const { tagId } = await deleteTagRequestSchema.parseAsync(req.body)
 
-    const tag = await TagRepository.deleteTag(BigInt(tagId))
+    const tag = await TagRepository.deleteTag(string(tagId))
 
     const response: ApiResponse<Tag> = {
       data: tag,

@@ -11,12 +11,11 @@ export const getDepartmentsByFacultyId = async (
   res: Response
 ) => {
   try {
-    const { facultyId } = await getDepartmentsByFacultyIdRequestSchema.parseAsync(
-      req.params
-    )
-    const departments = await DepartmentRepository.getDepartmentsByFacultyId(
-      BigInt(facultyId)
-    )
+    const { facultyId } =
+      await getDepartmentsByFacultyIdRequestSchema.parseAsync(req.params)
+
+    const departments =
+      await DepartmentRepository.getDepartmentsByFacultyId(facultyId)
 
     const response: ApiResponse<Department[]> = {
       data: departments,

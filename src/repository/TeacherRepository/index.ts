@@ -19,8 +19,8 @@ export const addTeacher = async (
 }
 
 export const addTeacherDepartment = async (
-  teacherId: bigint,
-  departmentIds: bigint[]
+  teacherId: string,
+  departmentIds: string[]
 ): Promise<void> => {
   await Prisma.teacherDepartment.createMany({
     data: departmentIds.map((departmentId) => ({

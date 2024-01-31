@@ -18,8 +18,8 @@ export const addStaff = async (staff: AddStaffParams): Promise<Staff> => {
 }
 
 export const addStaffDepartment = async (
-  staffId: bigint,
-  departmentIds: bigint[]
+  staffId: string,
+  departmentIds: string[]
 ): Promise<void> => {
   await Prisma.staffDepartment.createMany({
     data: departmentIds.map((departmentId) => ({

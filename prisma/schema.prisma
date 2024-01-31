@@ -60,11 +60,11 @@ model User {
   documentTimelines    DocumentTimeline[]
   userCreatedFaqs      Faq[]              @relation("user_created_faq")
   userUpdatedFaqs      Faq[]              @relation("user_updated_faq")
-  staff                Staff[]
-  students             Student[]
+  staff                Staff?
+  students             Student?
   userCreatedSubFaqs   SubFaq[]           @relation("user_created_sub_faq")
   userUpdatedSubFaqs   SubFaq[]           @relation("user_updated_sub_faq")
-  teachers             Teacher[]
+  teachers             Teacher?
   userCreatedTemplates Template[]         @relation("user_created_template")
   userUpdatedTemplates Template[]         @relation("user_updated_template")
   userGroups           UserGroup[]
@@ -74,7 +74,7 @@ model User {
 
 model Student {
   id            String   @id @default(uuid())
-  userId        String   @map("user_id")
+  userId        String   @unique @map("user_id")
   courseId      String   @map("course_id")
   advisorId     String?  @map("advisor_id")
   studentNumber String   @unique @map("student_number")
@@ -88,7 +88,7 @@ model Student {
 
 model Teacher {
   id                 String              @id @default(uuid())
-  userId             String              @map("user_id")
+  userId             String              @unique @map("user_id")
   staffNumber        String              @unique @map("staff_number")
   students           Student[]
   user               User                @relation(fields: [userId], references: [id])
@@ -110,7 +110,7 @@ model TeacherDepartment {
 
 model Staff {
   id               String            @id @default(uuid())
-  userId           String            @map("user_id")
+  userId           String            @unique @map("user_id")
   staffNumber      String            @unique @map("staff_number")
   type             StaffType
   user             User              @relation(fields: [userId], references: [id])
@@ -280,8 +280,8 @@ model DocumentSent {
 }
 
 enum DepartmentType {
-  DOG
-  CAT
+  DEPARTMENT
+  AGENCY
 
   @@map("department_type")
 }
@@ -290,6 +290,7 @@ enum Role {
   ADMIN
   STUDENT
   STAFF
+  TEACHER
 
   @@map("role")
 }

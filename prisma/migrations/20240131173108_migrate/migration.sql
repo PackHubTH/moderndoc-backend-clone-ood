@@ -1,8 +1,8 @@
 -- CreateEnum
-CREATE TYPE "department_type" AS ENUM ('DOG', 'CAT');
+CREATE TYPE "department_type" AS ENUM ('DEPARTMENT', 'AGENCY');
 
 -- CreateEnum
-CREATE TYPE "role" AS ENUM ('ADMIN', 'STUDENT', 'STAFF');
+CREATE TYPE "role" AS ENUM ('ADMIN', 'STUDENT', 'STAFF', 'TEACHER');
 
 -- CreateEnum
 CREATE TYPE "staff_type" AS ENUM ('STAFF', 'ADMIN');
@@ -246,10 +246,19 @@ CREATE UNIQUE INDEX "course_name_key" ON "course"("name");
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "student_user_id_key" ON "student"("user_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "student_student_number_key" ON "student"("student_number");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "teacher_user_id_key" ON "teacher"("user_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "teacher_staff_number_key" ON "teacher"("staff_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "staff_user_id_key" ON "staff"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "staff_staff_number_key" ON "staff"("staff_number");

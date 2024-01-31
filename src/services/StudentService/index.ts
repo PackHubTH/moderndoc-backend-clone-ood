@@ -7,7 +7,7 @@ export const addStudent = async (
   params: RegisterStudentParams
 ): Promise<Student> => {
   const newUser = await addUser({
-    email: params.email,
+    emails: params.emails,
     nameEn: params.nameEn,
     nameTh: params.nameTh,
     phone: params.phone,

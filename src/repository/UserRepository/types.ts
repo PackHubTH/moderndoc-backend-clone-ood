@@ -4,7 +4,7 @@ export type addUserParams = {
   nameTh: string
   nameEn: string
   role: Role
-  email: string[]
+  emails: string[]
   defaultEmailIndex?: number
   profileImg?: string
   phone: string

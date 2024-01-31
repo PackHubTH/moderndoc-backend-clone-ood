@@ -2,8 +2,8 @@ import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from 'models/response'
 import { addStaff } from 'services/StaffService'
-import { addTeacher } from 'services/StaffService copy'
 import { addStudent } from 'services/StudentService'
+import { addTeacher } from 'services/TeacherService'
 
 import { registerStaffSchema, registerStudentSchema } from './types'
 
