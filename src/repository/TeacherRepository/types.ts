@@ -1,5 +1,5 @@
 export type AddTeacherParams = {
-  userId: bigint
-  departmentIds: bigint[]
+  userId: string
+  departmentIds: string[]
   staffNumber: string
 }

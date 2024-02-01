@@ -75,12 +75,12 @@ model User {
 model Student {
   id            String   @id @default(uuid())
   userId        String   @unique @map("user_id")
-  courseId      String   @map("course_id")
+  courseId      String?  @map("course_id")
   advisorId     String?  @map("advisor_id")
   studentNumber String   @unique @map("student_number")
   isApproved    Boolean  @default(false) @map("is_approved")
   advisor       Teacher? @relation(fields: [advisorId], references: [id])
-  course        Course   @relation(fields: [courseId], references: [id])
+  course        Course?  @relation(fields: [courseId], references: [id])
   user          User     @relation(fields: [userId], references: [id])
 
   @@map("student")

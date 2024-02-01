@@ -21,10 +21,20 @@ export const addStaffDepartment = async (
   staffId: string,
   departmentIds: string[]
 ): Promise<void> => {
-  await Prisma.staffDepartment.createMany({
-    data: departmentIds.map((departmentId) => ({
-      departmentId,
-      staffId,
-    })),
-  })
+  for (const departmentId of departmentIds) {
+    await Prisma.staffDepartment.create({
+      data: {
+        staff: {
+          connect: {
+            id: staffId,
+          },
+        },
+        department: {
+          connect: {
+            id: departmentId,
+          },
+        },
+      },
+    })
+  }
 }
