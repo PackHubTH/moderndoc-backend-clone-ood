@@ -3,6 +3,6 @@ import Router from 'express'
 
 const course = Router()
 
-course.get('/department/:departmentId', getCoursesByDepartmentId)
+course.get('/', getCoursesByDepartmentId)
 
 export default course

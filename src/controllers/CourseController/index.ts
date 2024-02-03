@@ -8,10 +8,13 @@ import { getCoursesByDepartmentIdRequestSchema } from './types'
 
 export const getCoursesByDepartmentId = async (req: Request, res: Response) => {
   try {
-    const { departmentId } =
-      await getCoursesByDepartmentIdRequestSchema.parseAsync(req.params)
-    const courses =
-      await CourseRepository.getCoursesByDepartmentId(departmentId)
+    const { departmentId, level } =
+      await getCoursesByDepartmentIdRequestSchema.parseAsync(req.query)
+
+    const courses = await CourseRepository.getCoursesByDepartmentId(
+      departmentId,
+      level
+    )
 
     const response: ApiResponse<Course[]> = {
       data: courses,

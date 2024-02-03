@@ -35,6 +35,7 @@ model Course {
   id           String     @id @default(uuid())
   name         String     @unique
   departmentId String     @map("department_id")
+  level        Level      @default(BACHELOR)
   department   Department @relation(fields: [departmentId], references: [id])
   students     Student[]
 
@@ -61,10 +62,10 @@ model User {
   userCreatedFaqs      Faq[]              @relation("user_created_faq")
   userUpdatedFaqs      Faq[]              @relation("user_updated_faq")
   staff                Staff?
-  students             Student?
+  student              Student?
   userCreatedSubFaqs   SubFaq[]           @relation("user_created_sub_faq")
   userUpdatedSubFaqs   SubFaq[]           @relation("user_updated_sub_faq")
-  teachers             Teacher?
+  teacher              Teacher?
   userCreatedTemplates Template[]         @relation("user_created_template")
   userUpdatedTemplates Template[]         @relation("user_updated_template")
   userGroups           UserGroup[]
@@ -277,6 +278,14 @@ model DocumentSent {
 
   @@id([documentId, receiverId, sendAt])
   @@map("document_sent")
+}
+
+enum Level {
+  BACHELOR
+  MASTER
+  DOCTOR
+
+  @@map("level")
 }
 
 enum DepartmentType {

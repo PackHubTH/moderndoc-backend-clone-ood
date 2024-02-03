@@ -18,7 +18,7 @@ export const registerStudentSchema = z.object({
 export type RegisterStudentParams = z.infer<typeof registerStudentSchema>
 
 export const registerStaffSchema = z.object({
-  role: z.enum([Role.ADMIN, Role.STAFF, Role.TEACHER]),
+  role: z.nativeEnum(Role),
   nameTh: z.string().min(5).max(255),
   nameEn: z.string().min(5).max(255),
   staffNumber: z.string(),
