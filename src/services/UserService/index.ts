@@ -12,7 +12,5 @@ export const getUserById = async (userId: string) => {
     },
   })
 
-  console.log(userId, user)
-
   return user
 }

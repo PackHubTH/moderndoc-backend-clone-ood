@@ -1,5 +1,6 @@
 import {
   getUserById,
+  login,
   registerStaff,
   registerStudent,
   registerTeacher,
@@ -12,6 +13,7 @@ user.get('/:userId', getUserById)
 user.post('/student', registerStudent)
 user.post('/staff', registerStaff)
 user.post('/teacher', registerTeacher)
-// user.put('/',updateUser)
+// user.post('/',updateUser)
+user.post('/login', login)
 
 export default user

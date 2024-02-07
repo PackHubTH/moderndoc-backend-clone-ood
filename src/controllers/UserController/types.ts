@@ -33,3 +33,7 @@ export const registerStaffSchema = z.object({
 })
 
 export type RegisterStaffSchema = z.infer<typeof registerStaffSchema>
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+})

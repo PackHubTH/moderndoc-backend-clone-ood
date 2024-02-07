@@ -8,9 +8,31 @@ export const getUserById = async (id: string): Promise<User> => {
     where: {
       id,
     },
+    include: {
+      student: true,
+      teacher: true,
+      staff: true,
+    },
   })
 
   if (!user) throw new Error('User not found')
+
+  return user
+}
+
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+  const user = await Prisma.user.findFirst({
+    where: {
+      emails: {
+        hasSome: [email],
+      },
+    },
+    include: {
+      student: true,
+      teacher: true,
+      staff: true,
+    },
+  })
 
   return user
 }
