@@ -1,4 +1,5 @@
 import { Role } from '@prisma/client'
+import { GetUserByEmail } from 'repository/UserRepository/types'
 import { z } from 'zod'
 
 export const registerStudentSchema = z.object({
@@ -37,3 +38,8 @@ export type RegisterStaffSchema = z.infer<typeof registerStaffSchema>
 export const loginSchema = z.object({
   email: z.string().email(),
 })
+
+export type RegisterResponse = GetUserByEmail & {
+  token: string
+  isFinishRegister: boolean
+}

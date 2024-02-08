@@ -1,7 +1,7 @@
 import Prisma from '@prisma'
 import type { User } from '@prisma/client'
 
-import { addUserParams } from './types'
+import { AddUserParams, GetUserByEmail } from './types'
 
 export const getUserById = async (id: string): Promise<User> => {
   const user = await Prisma.user.findFirst({
@@ -20,7 +20,9 @@ export const getUserById = async (id: string): Promise<User> => {
   return user
 }
 
-export const getUserByEmail = async (email: string): Promise<User | null> => {
+export const getUserByEmail = async (
+  email: string
+): Promise<GetUserByEmail | null> => {
   const user = await Prisma.user.findFirst({
     where: {
       emails: {
@@ -37,7 +39,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
   return user
 }
 
-export const addUser = async (user: addUserParams): Promise<User> => {
+export const addUser = async (user: AddUserParams): Promise<User> => {
   const { emails, nameEn, nameTh, phone, profileImg, role } = user
 
   const phoneArr = []

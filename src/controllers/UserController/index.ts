@@ -5,37 +5,15 @@ import { getUserByEmail } from 'repository/UserRepository'
 import { addStaff } from 'services/StaffService'
 import { addStudent } from 'services/StudentService'
 import { addTeacher } from 'services/TeacherService'
-import { getUserById as getUserByIdService } from 'services/UserService'
 import { generateToken } from 'utils/authUtils'
+import { getIsUserFinishedRegister } from 'utils/userUtils'
 
 import {
   loginSchema,
+  RegisterResponse,
   registerStaffSchema,
   registerStudentSchema,
 } from './types'
-
-export const getUserById = async (req: Request, res: Response) => {
-  try {
-    const { userId } = req.params
-
-    const user = await getUserByIdService(userId)
-
-    const response: ApiResponse<typeof user> = {
-      data: user,
-      message: 'Successfully retrieved user',
-      error: null,
-    }
-
-    return res.status(StatusCodes.OK).json(response)
-  } catch (error) {
-    const response: ApiResponse<null> = {
-      data: null,
-      message: 'Invalid request body',
-      error: error,
-    }
-    return res.status(StatusCodes.BAD_REQUEST).json(response)
-  }
-}
 
 export const registerStudent = async (req: Request, res: Response) => {
   try {
@@ -43,8 +21,24 @@ export const registerStudent = async (req: Request, res: Response) => {
 
     await addStudent(requestData)
 
-    const response: ApiResponse<null> = {
-      data: null,
+    const user = await getUserByEmail(requestData.emails[0])
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'There was an error registering the user',
+        error: null,
+      }
+      return res.status(StatusCodes.IM_A_TEAPOT).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully registered',
       error: null,
     }
@@ -66,8 +60,25 @@ export const registerTeacher = async (req: Request, res: Response) => {
 
     await addTeacher(requestData)
 
-    const response: ApiResponse<null> = {
-      data: null,
+    const user = await getUserByEmail(requestData.emails[0])
+
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'There was an error registering the user',
+        error: null,
+      }
+      return res.status(StatusCodes.IM_A_TEAPOT).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully registered',
       error: null,
     }
@@ -89,8 +100,24 @@ export const registerStaff = async (req: Request, res: Response) => {
 
     await addStaff(requestData)
 
-    const response: ApiResponse<null> = {
-      data: null,
+    const user = await getUserByEmail(requestData.emails[0])
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'There was an error registering the user',
+        error: null,
+      }
+      return res.status(StatusCodes.IM_A_TEAPOT).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully registered',
       error: null,
     }
@@ -123,8 +150,12 @@ export const login = async (req: Request, res: Response) => {
 
     const token = generateToken(user)
 
-    const response = {
-      data: { ...user, token: token },
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully logged in',
       error: null,
     }
