@@ -1,22 +1,25 @@
-import { Student } from '@prisma/client'
+import { Student, User } from '@prisma/client'
 import { RegisterStudentParams } from 'controllers/UserController/types'
 import * as StudentRepository from 'repository/StudentRepository'
-import { addUser } from 'repository/UserRepository'
+import { addUser, getUserByEmail } from 'repository/UserRepository'
 
 export const addStudent = async (
   params: RegisterStudentParams
 ): Promise<Student> => {
-  const newUser = await addUser({
-    email: params.email,
-    nameEn: params.nameEn,
-    nameTh: params.nameTh,
-    phone: params.phone,
-    profileImg: params.profileImg,
-    role: 'STUDENT',
-  })
+  let user = (await getUserByEmail(params.emails[0])) as User | null
+
+  if (!user)
+    user = await addUser({
+      emails: params.emails,
+      nameEn: params.nameEn,
+      nameTh: params.nameTh,
+      phone: params.phone,
+      profileImg: params.profileImg,
+      role: 'STUDENT',
+    })
 
   const student = await StudentRepository.addStudent({
-    userId: newUser.id,
+    userId: user.id,
     studentNumber: params.studentNumber,
     courseId: params.courseId,
   })

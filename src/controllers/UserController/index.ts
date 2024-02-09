@@ -1,11 +1,19 @@
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from 'models/response'
+import { getUserByEmail } from 'repository/UserRepository'
 import { addStaff } from 'services/StaffService'
-import { addTeacher } from 'services/StaffService copy'
 import { addStudent } from 'services/StudentService'
+import { addTeacher } from 'services/TeacherService'
+import { generateToken } from 'utils/authUtils'
+import { getIsUserFinishedRegister } from 'utils/userUtils'
 
-import { registerStaffSchema, registerStudentSchema } from './types'
+import {
+  loginSchema,
+  RegisterResponse,
+  registerStaffSchema,
+  registerStudentSchema,
+} from './types'
 
 export const registerStudent = async (req: Request, res: Response) => {
   try {
@@ -13,8 +21,24 @@ export const registerStudent = async (req: Request, res: Response) => {
 
     await addStudent(requestData)
 
-    const response: ApiResponse<null> = {
-      data: null,
+    const user = await getUserByEmail(requestData.emails[0])
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'There was an error registering the user',
+        error: null,
+      }
+      return res.status(StatusCodes.IM_A_TEAPOT).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully registered',
       error: null,
     }
@@ -36,8 +60,25 @@ export const registerTeacher = async (req: Request, res: Response) => {
 
     await addTeacher(requestData)
 
-    const response: ApiResponse<null> = {
-      data: null,
+    const user = await getUserByEmail(requestData.emails[0])
+
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'There was an error registering the user',
+        error: null,
+      }
+      return res.status(StatusCodes.IM_A_TEAPOT).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully registered',
       error: null,
     }
@@ -59,13 +100,67 @@ export const registerStaff = async (req: Request, res: Response) => {
 
     await addStaff(requestData)
 
-    const response: ApiResponse<null> = {
-      data: null,
+    const user = await getUserByEmail(requestData.emails[0])
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'There was an error registering the user',
+        error: null,
+      }
+      return res.status(StatusCodes.IM_A_TEAPOT).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
       message: 'Successfully registered',
       error: null,
     }
 
     return res.status(StatusCodes.CREATED).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Invalid request body',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const { email } = await loginSchema.parseAsync(req.body)
+
+    const user = await getUserByEmail(email)
+
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'User not found',
+        error: null,
+      }
+      return res.status(StatusCodes.OK).json(response)
+    }
+
+    const token = generateToken(user)
+
+    const response: ApiResponse<RegisterResponse> = {
+      data: {
+        ...user,
+        token: token,
+        isFinishRegister: getIsUserFinishedRegister(user),
+      },
+      message: 'Successfully logged in',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
   } catch (error) {
     const response: ApiResponse<null> = {
       data: null,

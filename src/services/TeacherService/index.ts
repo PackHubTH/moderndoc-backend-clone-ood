@@ -1,12 +1,14 @@
-import { Staff, StaffType, User } from '@prisma/client'
+import { Teacher, User } from '@prisma/client'
 import { RegisterStaffSchema } from 'controllers/UserController/types'
-import * as StaffRepository from 'repository/StaffRepository'
+import * as TeacherRepository from 'repository/TeacherRepository'
 import { addUser, getUserByEmail } from 'repository/UserRepository'
 
-export const addStaff = async (params: RegisterStaffSchema): Promise<Staff> => {
+export const addTeacher = async (
+  params: RegisterStaffSchema
+): Promise<Teacher> => {
   let user = (await getUserByEmail(params.emails[0])) as User | null
 
-  if (!user) {
+  if (!user)
     user = await addUser({
       emails: params.emails,
       nameEn: params.nameEn,
@@ -15,14 +17,12 @@ export const addStaff = async (params: RegisterStaffSchema): Promise<Staff> => {
       profileImg: params.profileImg,
       role: params.role,
     })
-  }
 
-  const staff = await StaffRepository.addStaff({
+  const teacher = await TeacherRepository.addTeacher({
     userId: user.id,
     staffNumber: params.staffNumber,
-    type: params.role === 'ADMIN' ? StaffType.ADMIN : StaffType.STAFF,
     departmentIds: params.departmentIds,
   })
 
-  return staff
+  return teacher
 }

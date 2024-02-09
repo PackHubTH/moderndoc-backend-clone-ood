@@ -1,11 +1,19 @@
-import type { Role } from '@prisma/client'
+import type { Prisma, Role } from '@prisma/client'
 
-export type addUserParams = {
+export type AddUserParams = {
   nameTh: string
   nameEn: string
   role: Role
-  email: string[]
+  emails: string[]
   defaultEmailIndex?: number
   profileImg?: string
   phone: string
 }
+
+export type GetUserByEmail = Prisma.UserGetPayload<{
+  include: {
+    staff: true
+    teacher: true
+    student: true
+  }
+}>

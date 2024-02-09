@@ -35,6 +35,7 @@ model Course {
   id           String     @id @default(uuid())
   name         String     @unique
   departmentId String     @map("department_id")
+  level        Level      @default(BACHELOR)
   department   Department @relation(fields: [departmentId], references: [id])
   students     Student[]
 
@@ -60,11 +61,11 @@ model User {
   documentTimelines    DocumentTimeline[]
   userCreatedFaqs      Faq[]              @relation("user_created_faq")
   userUpdatedFaqs      Faq[]              @relation("user_updated_faq")
-  staff                Staff[]
-  students             Student[]
+  staff                Staff?
+  student              Student?
   userCreatedSubFaqs   SubFaq[]           @relation("user_created_sub_faq")
   userUpdatedSubFaqs   SubFaq[]           @relation("user_updated_sub_faq")
-  teachers             Teacher[]
+  teacher              Teacher?
   userCreatedTemplates Template[]         @relation("user_created_template")
   userUpdatedTemplates Template[]         @relation("user_updated_template")
   userGroups           UserGroup[]
@@ -74,13 +75,13 @@ model User {
 
 model Student {
   id            String   @id @default(uuid())
-  userId        String   @map("user_id")
-  courseId      String   @map("course_id")
+  userId        String   @unique @map("user_id")
+  courseId      String?  @map("course_id")
   advisorId     String?  @map("advisor_id")
   studentNumber String   @unique @map("student_number")
   isApproved    Boolean  @default(false) @map("is_approved")
   advisor       Teacher? @relation(fields: [advisorId], references: [id])
-  course        Course   @relation(fields: [courseId], references: [id])
+  course        Course?  @relation(fields: [courseId], references: [id])
   user          User     @relation(fields: [userId], references: [id])
 
   @@map("student")
@@ -88,7 +89,7 @@ model Student {
 
 model Teacher {
   id                 String              @id @default(uuid())
-  userId             String              @map("user_id")
+  userId             String              @unique @map("user_id")
   staffNumber        String              @unique @map("staff_number")
   students           Student[]
   user               User                @relation(fields: [userId], references: [id])
@@ -110,7 +111,7 @@ model TeacherDepartment {
 
 model Staff {
   id               String            @id @default(uuid())
-  userId           String            @map("user_id")
+  userId           String            @unique @map("user_id")
   staffNumber      String            @unique @map("staff_number")
   type             StaffType
   user             User              @relation(fields: [userId], references: [id])
@@ -279,9 +280,17 @@ model DocumentSent {
   @@map("document_sent")
 }
 
+enum Level {
+  BACHELOR
+  MASTER
+  DOCTOR
+
+  @@map("level")
+}
+
 enum DepartmentType {
-  DOG
-  CAT
+  DEPARTMENT
+  AGENCY
 
   @@map("department_type")
 }
@@ -290,6 +299,7 @@ enum Role {
   ADMIN
   STUDENT
   STAFF
+  TEACHER
 
   @@map("role")
 }
