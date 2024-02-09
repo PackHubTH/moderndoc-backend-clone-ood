@@ -8,6 +8,7 @@
     "build": "bun run tsc",
     "start": "bun dist/index.js",
     "dev": "bun --hot index.ts",
+    "dev:yarn": "ts-node-dev -r tsconfig-paths/register index.ts",
     "db:pull": "prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate",
     "db:push": "prisma migrate dev --name migrate && prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate"
   },
@@ -25,13 +26,6 @@
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   },
-  "engines": {
-    "npm": "please use bun my brother",
-    "node": "please use bun my brother",
-    "yarn": "please use bun my brother",
-    "pnpm": "please use bun my brother",
-    "bun": "1.0.0"
-  },
   "dependencies": {
     "@prisma/client": "^5.8.1",
     "@types/jsonwebtoken": "^9.0.5",
@@ -42,6 +36,7 @@
     "jsonwebtoken": "^9.0.2",
     "prisma": "^5.8.1",
     "prisma-case-format": "^2.2.0",
+    "tsconfig-paths": "^4.2.0",
     "zod": "^3.22.4"
   }
 }
