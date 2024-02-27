@@ -51,7 +51,7 @@ model User {
   defaultPhoneIndex    Int                @default(0) @map("default_phone_index")
   profileImg           String?            @map("profile_img")
   signatures           String[]           @map("signature")
-  notificationConfig   Json               @default("{}") @map("notification_config")
+  notificationConfig   Json?              @default("[1, 3, 7]") @map("notification_config")
   createdAt            DateTime           @default(now()) @map("created_at")
   nameEn               String             @map("nameEN")
   nameTh               String             @map("nameTH")

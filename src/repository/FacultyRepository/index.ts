@@ -6,3 +6,13 @@ export const getAllFaculties = async (): Promise<Faculty[]> => {
 
   return faculties
 }
+
+export const getFacultyById = async (id: string): Promise<Faculty | null> => {
+  const faculty = await prisma.faculty.findFirst({
+    where: {
+      id,
+    },
+  })
+
+  return faculty
+}

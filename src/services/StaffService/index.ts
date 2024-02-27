@@ -1,7 +1,15 @@
 import { Staff, StaffType, User } from '@prisma/client'
-import { RegisterStaffSchema } from 'controllers/UserController/types'
+import {
+  RegisterStaffSchema,
+  UpdateUserParams,
+} from 'controllers/UserController/types'
 import * as StaffRepository from 'repository/StaffRepository'
-import { addUser, getUserByEmail } from 'repository/UserRepository'
+import {
+  addUser,
+  getUserByEmail,
+  getUserById,
+  updateUser,
+} from 'repository/UserRepository'
 
 export const addStaff = async (params: RegisterStaffSchema): Promise<Staff> => {
   let user = (await getUserByEmail(params.emails[0])) as User | null
@@ -25,4 +33,33 @@ export const addStaff = async (params: RegisterStaffSchema): Promise<Staff> => {
   })
 
   return staff
+}
+
+export const updateStaff = async (params: UpdateUserParams) => {
+  const user = await getUserById(params.user.id)
+  const staff = await StaffRepository.getStaffByUserId(user.id)
+  if (!user || !staff || !params.staff) throw new Error('User not found')
+
+  const emails = params.user.emails
+  emails[0] = user.emails[0]
+
+  const updatedUser: User = {
+    ...user,
+    role: params.role,
+    emails,
+  }
+
+  await updateUser(updatedUser)
+
+  await StaffRepository.updateStaff(params.staff)
+
+  const isDepartmentChanged =
+    staff.staffDepartments[0].id !== params.staff.staffDepartments[0].id
+
+  if (isDepartmentChanged) {
+    await StaffRepository.deleteAllStaffDepartment(staff.id)
+    await StaffRepository.addStaffDepartment(staff.id, [
+      params.staff.staffDepartments[0].id,
+    ])
+  }
 }

@@ -58,3 +58,25 @@ export const addUser = async (user: AddUserParams): Promise<User> => {
 
   return newUser
 }
+
+export const updateUser = async (user: User): Promise<User> => {
+  const updatedUser = await Prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      nameEn: user.nameEn,
+      nameTh: user.nameTh,
+      phones: user.phones!,
+      emails: user.emails!,
+      profileImg: user.profileImg,
+      role: user.role,
+      defaultEmailIndex: user.defaultEmailIndex,
+      defaultPhoneIndex: user.defaultPhoneIndex,
+      signatures: user.signatures,
+      notificationConfig: user.notificationConfig!,
+    },
+  })
+
+  return updatedUser
+}

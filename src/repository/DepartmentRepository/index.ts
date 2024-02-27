@@ -22,3 +22,18 @@ export const getAllAgencyDepartments = async (): Promise<Department[]> => {
 
   return department
 }
+
+export const getDepartmentById = async (
+  id: string
+): Promise<Department | null> => {
+  const department = await prisma.department.findFirst({
+    where: {
+      id,
+    },
+    include: {
+      faculty: true,
+    },
+  })
+
+  return department
+}

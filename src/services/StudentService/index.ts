@@ -1,7 +1,15 @@
 import { Student, User } from '@prisma/client'
-import { RegisterStudentParams } from 'controllers/UserController/types'
+import {
+  RegisterStudentParams,
+  UpdateUserParams,
+} from 'controllers/UserController/types'
 import * as StudentRepository from 'repository/StudentRepository'
-import { addUser, getUserByEmail } from 'repository/UserRepository'
+import {
+  addUser,
+  getUserByEmail,
+  getUserById,
+  updateUser,
+} from 'repository/UserRepository'
 
 export const addStudent = async (
   params: RegisterStudentParams
@@ -25,4 +33,34 @@ export const addStudent = async (
   })
 
   return student
+}
+
+export const updateStudent = async (params: UpdateUserParams) => {
+  const user = await getUserById(params.user.id)
+  const student = await StudentRepository.getStudentByUserId(params.user.id)
+  if (!user || !student || !params.student) throw new Error('User not found')
+
+  const emails = params.user.emails
+  emails[0] = user.emails[0]
+
+  const updatedUser: User = {
+    ...params.user,
+    role: 'STUDENT',
+    emails,
+  }
+
+  await updateUser(updatedUser)
+
+  const isCourseChanged = student.courseId !== params.student.courseId
+
+  const updatedStudent: Student = {
+    ...student,
+    advisorId: params.student.advisorId,
+    courseId: params.student.courseId,
+    isApproved: isCourseChanged ? false : student.isApproved,
+  }
+
+  const result = await StudentRepository.updateStudent(updatedStudent)
+
+  return result
 }

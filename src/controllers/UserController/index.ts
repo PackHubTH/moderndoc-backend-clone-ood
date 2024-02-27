@@ -1,18 +1,24 @@
+import { User } from '@prisma/client'
 import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from 'models/response'
 import { getUserByEmail } from 'repository/UserRepository'
-import { addStaff } from 'services/StaffService'
-import { addStudent } from 'services/StudentService'
-import { addTeacher } from 'services/TeacherService'
+import { addStaff, updateStaff } from 'services/StaffService'
+import { addStudent, updateStudent } from 'services/StudentService'
+import { addTeacher, updateTeacher } from 'services/TeacherService'
+import { getUserById } from 'services/UserService'
 import { generateToken } from 'utils/authUtils'
 import { getIsUserFinishedRegister } from 'utils/userUtils'
+import z from 'zod'
 
+import * as TeacherRepository from './../../repository/TeacherRepository/index'
 import {
+  getUserSchema,
   loginSchema,
   RegisterResponse,
   registerStaffSchema,
   registerStudentSchema,
+  updateUserSchema,
 } from './types'
 
 export const registerStudent = async (req: Request, res: Response) => {
@@ -157,6 +163,94 @@ export const login = async (req: Request, res: Response) => {
         isFinishRegister: getIsUserFinishedRegister(user),
       },
       message: 'Successfully logged in',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Invalid request body',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const updatedUser = async (req: Request, res: Response) => {
+  try {
+    const request = await updateUserSchema.parseAsync(req.body)
+    switch (request.role) {
+      case 'STUDENT':
+        await updateStudent(request)
+        break
+      case 'TEACHER':
+        await updateTeacher(request)
+        break
+      case 'STAFF':
+        await updateStaff(request)
+        break
+    }
+
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Successfully updated user',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Invalid request body',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const getTeachersByName = async (req: Request, res: Response) => {
+  const getTeachersByNameSchema = z.string().min(3)
+  try {
+    const name = await getTeachersByNameSchema.parseAsync(req.query.name)
+
+    const teachers = await TeacherRepository.getTeachersByName(name)
+
+    const response: ApiResponse<User[]> = {
+      data: teachers,
+      message: 'Successfully retrieved teachers',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Invalid request body',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const getUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = await getUserSchema.parseAsync(req.headers)
+
+    const user = await getUserById(userId)
+
+    if (user === null) {
+      const response: ApiResponse<null> = {
+        data: null,
+        message: 'User not found',
+        error: null,
+      }
+      return res.status(StatusCodes.OK).json(response)
+    }
+
+    const response: ApiResponse<unknown> = {
+      data: user,
+      message: 'Successfully retrieved user',
       error: null,
     }
 

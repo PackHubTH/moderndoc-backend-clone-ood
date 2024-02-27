@@ -1,7 +1,7 @@
 import Prisma from '@prisma'
 import type { Staff } from '@prisma/client'
 
-import { AddStaffParams } from './types'
+import { AddStaffParams, GetStaffById } from './types'
 
 export const addStaff = async (staff: AddStaffParams): Promise<Staff> => {
   const newStaff = await Prisma.staff.create({
@@ -37,4 +37,42 @@ export const addStaffDepartment = async (
       },
     })
   }
+}
+
+export const deleteAllStaffDepartment = async (
+  staffId: string
+): Promise<void> => {
+  await Prisma.staffDepartment.deleteMany({
+    where: {
+      staffId,
+    },
+  })
+}
+
+export const updateStaff = async (staff: Staff): Promise<Staff> => {
+  const updatedStaff = await Prisma.staff.update({
+    where: {
+      id: staff.id,
+    },
+    data: {
+      staffNumber: staff.staffNumber,
+    },
+  })
+
+  return updatedStaff
+}
+
+export const getStaffByUserId = async (
+  userId: string
+): Promise<GetStaffById | null> => {
+  const staff = await Prisma.staff.findUnique({
+    where: {
+      userId,
+    },
+    include: {
+      staffDepartments: true,
+    },
+  })
+
+  return staff
 }

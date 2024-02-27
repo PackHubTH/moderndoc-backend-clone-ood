@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client'
+import { Prisma, Role, Staff, Student, Teacher, User } from '@prisma/client'
 import { GetUserByEmail } from 'repository/UserRepository/types'
 import { z } from 'zod'
 
@@ -43,3 +43,49 @@ export type RegisterResponse = GetUserByEmail & {
   token: string
   isFinishRegister: boolean
 }
+
+export type updateUser = {
+  role: Role
+  student?: Student
+  staff?: Staff
+  teacher?: Teacher
+  User: User
+}
+export const updateUserSchema = z
+  .object({
+    role: z.nativeEnum(Role),
+    user: z.custom<User>(),
+    student: z.custom<Student>().optional(),
+    staff: z
+      .custom<
+        Prisma.StaffGetPayload<{
+          include: { staffDepartments: true }
+        }>
+      >()
+      .optional(),
+    teacher: z
+      .custom<
+        Prisma.TeacherGetPayload<{
+          include: { teacherDepartments: true }
+        }>
+      >()
+      .optional(),
+  })
+  .refine((data) => {
+    if (data.role === 'STUDENT' && !data.student) {
+      throw new Error('Student data is required')
+    }
+    if (data.role === 'TEACHER' && !data.teacher) {
+      throw new Error('Teacher data is required')
+    }
+    if (data.role === 'STAFF' && !data.staff) {
+      throw new Error('Staff data is required')
+    }
+    return true
+  })
+
+export type UpdateUserParams = z.infer<typeof updateUserSchema>
+
+export const getUserSchema = z.object({
+  userId: z.string().uuid(),
+})

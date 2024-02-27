@@ -1,4 +1,4 @@
-import { StaffType } from '@prisma/client'
+import { Prisma, Staff, StaffType, User } from '@prisma/client'
 
 export type AddStaffParams = {
   userId: string
@@ -6,3 +6,14 @@ export type AddStaffParams = {
   staffNumber: string
   type: StaffType
 }
+
+export type UpdateStaffParams = {
+  staff: Staff
+  user: User
+}
+
+export type GetStaffById = Prisma.StaffGetPayload<{
+  include: {
+    staffDepartments: true
+  }
+}>
