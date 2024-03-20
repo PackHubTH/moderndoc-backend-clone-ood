@@ -24,6 +24,7 @@ model Department {
   facultyId          String?             @map("faculty_id")
   courses            Course[]
   faculty            Faculty?            @relation(fields: [facultyId], references: [id])
+  faqs               Faq[]
   staffDepartments   StaffDepartment[]
   teacherDepartments TeacherDepartment[]
   templates          Template[]
@@ -132,23 +133,28 @@ model StaffDepartment {
 }
 
 model Faq {
-  id            String    @id @default(uuid())
-  templateId    String?   @map("template_id")
-  title         String
-  documentCode  String    @map("document_code")
-  description   String
-  guideline     String
-  extraContact  String    @map("extra_contact")
-  file          String?
-  isInternal    Boolean   @map("is_internal")
-  createdBy     String    @map("created_by")
-  updatedBy     String    @map("updated_by")
-  lastUpdatedAt DateTime  @updatedAt @map("last_updated_at")
-  userCreated   User      @relation("user_created_faq", fields: [createdBy], references: [id])
-  template      Template? @relation(fields: [templateId], references: [id])
-  userUpdated   User      @relation("user_updated_faq", fields: [updatedBy], references: [id])
-  faqTags       FaqTag[]
-  subFaqs       SubFaq[]
+  id              String              @id @default(uuid())
+  templateId      String?             @map("template_id")
+  description     String
+  isInternal      Boolean             @map("is_internal")
+  createdBy       String              @map("created_by")
+  updatedBy       String              @map("updated_by")
+  lastUpdatedAt   DateTime            @updatedAt @map("last_updated_at")
+  departmentId    String              @map("department_id")
+  documentCodeEn  String              @map("document_code_en")
+  documentCodeTh  String              @map("document_code_th")
+  sendChannel     SendDocumentChannel @map("send_channel")
+  sendChannelInfo String?             @map("send_channel_info")
+  titleEn         String              @map("title_en")
+  titleTh         String              @map("title_th")
+  extraContact    Json                @default("{}") @map("extra_contact")
+  files           String[]            @default([]) @map("file")
+  userCreated     User                @relation("user_created_faq", fields: [createdBy], references: [id])
+  department      Department          @relation(fields: [departmentId], references: [id])
+  template        Template?           @relation(fields: [templateId], references: [id])
+  userUpdated     User                @relation("user_updated_faq", fields: [updatedBy], references: [id])
+  faqTags         FaqTag[]
+  subFaqs         SubFaq[]
 
   @@map("faq")
 }
@@ -158,12 +164,11 @@ model SubFaq {
   faqId         String   @map("faq_id")
   title         String
   description   String
-  isInternal    Boolean  @map("is_internal")
   createdBy     String   @map("created_by")
   updatedBy     String   @map("updated_by")
   lastUpdatedAt DateTime @updatedAt @map("last_updated_at")
   userCreated   User     @relation("user_created_sub_faq", fields: [createdBy], references: [id])
-  faq           Faq      @relation(fields: [faqId], references: [id])
+  faq           Faq      @relation(fields: [faqId], references: [id], onDelete: Cascade)
   userUpdated   User     @relation("user_updated_sub_faq", fields: [updatedBy], references: [id])
 
   @@map("sub_faq")
@@ -229,8 +234,8 @@ model Tag {
 model FaqTag {
   faqId String @map("faq_id")
   tagId String @map("tag_id")
-  faq   Faq    @relation(fields: [faqId], references: [id])
-  tag   Tag    @relation(fields: [tagId], references: [id])
+  faq   Faq    @relation(fields: [faqId], references: [id], onDelete: Cascade)
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([faqId, tagId])
   @@map("faq_tag")
@@ -278,6 +283,13 @@ model DocumentSent {
 
   @@id([documentId, receiverId, sendAt])
   @@map("document_sent")
+}
+
+enum SendDocumentChannel {
+  ONSITE
+  ONLINE
+  BOTH
+  OTHER
 }
 
 enum Level {

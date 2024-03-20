@@ -37,3 +37,28 @@ export const getDepartmentById = async (
 
   return department
 }
+
+export const addAgencyDepartment = async (
+  name: string
+): Promise<Department> => {
+  const department = await prisma.department.create({
+    data: {
+      name,
+      type: 'AGENCY',
+    },
+  })
+
+  return department
+}
+
+export const updateDepartment = async (departmentId: string, name: string) => {
+  const department = await prisma.department.update({
+    where: {
+      id: departmentId,
+    },
+    data: {
+      name,
+    },
+  })
+  return department
+}

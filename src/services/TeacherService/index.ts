@@ -49,16 +49,9 @@ export const updateTeacher = async (params: UpdateUserParams) => {
 
   const result = await TeacherRepository.updateTeacher(params.teacher)
 
-  console.log(
-    teacher.teacherDepartments[0].departmentId,
-    params.teacher
-  )
-
   const isDepartmentChanged =
     teacher.teacherDepartments[0].departmentId !==
     params.teacher.teacherDepartments[0].departmentId
-
-  console.log('🚀 ~ updateTeacher ~ isDepartmentChanged:', isDepartmentChanged)
 
   if (isDepartmentChanged) {
     await TeacherRepository.deleteAllTeacherDepartment(teacher.id)

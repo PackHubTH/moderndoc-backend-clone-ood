@@ -58,7 +58,7 @@ export const updateTag = async (req: Request, res: Response) => {
 
 export const deleteTag = async (req: Request, res: Response) => {
   try {
-    const { tagId } = await deleteTagRequestSchema.parseAsync(req.body)
+    const { tagId } = await deleteTagRequestSchema.parseAsync(req.params)
 
     const tag = await TagRepository.deleteTag(tagId)
 

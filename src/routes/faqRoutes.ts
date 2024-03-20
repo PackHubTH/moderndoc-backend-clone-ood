@@ -1,10 +1,26 @@
+import {
+  createFaq,
+  createSubFaq,
+  deleteSubFaq,
+  getAllFaqs,
+  getDepartmentFaqs,
+  updateFaq,
+  updateSubFaq,
+} from 'controllers/FaqController'
 import Router from 'express'
+import { validateToken } from 'middlewares/validateToken'
 
 const faq = Router()
 
-// faq.post('/',createFaq)
-// faq.put('/',updateFaq)
-// faq.get('/',getAllFaqs)
+faq.post('/', validateToken, createFaq)
+faq.put('/', validateToken, updateFaq)
+
+faq.post('/sub-faq', validateToken, createSubFaq)
+faq.put('/sub-faq', validateToken, updateSubFaq)
+faq.delete('/sub-faq/:subFaqId', validateToken, deleteSubFaq)
+
+faq.get('/', validateToken, getAllFaqs)
+faq.get('/department', validateToken, getDepartmentFaqs)
 // faq.get('/:id',getFaqById)
 // faq.get('tag/:id',getFaqsByTag)
 

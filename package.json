@@ -10,7 +10,7 @@
     "dev": "bun --hot index.ts",
     "dev:yarn": "ts-node-dev -r tsconfig-paths/register index.ts",
     "db:pull": "prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate",
-    "db:push": "prisma migrate dev --name migrate && prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate"
+    "db:push": "prisma db push && prisma db pull && prisma-case-format --file prisma/schema.prisma -p && prisma generate"
   },
   "keywords": [],
   "author": "Apicha On-amphai",
