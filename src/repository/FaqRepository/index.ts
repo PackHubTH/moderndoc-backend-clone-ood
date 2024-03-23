@@ -118,6 +118,7 @@ export const getAllPublicFaqs = async (
           tag: true,
         },
       },
+      template: true,
       department: true,
       userUpdated: {
         select: {
@@ -178,9 +179,9 @@ export const getAllDepartmentFaqs = async (
   })
 
   return {
-    faqs: faqs,
+    data: faqs,
     totalPages: totalPages,
-    totalFaqsCount: totalFaqsCount,
+    total: totalFaqsCount,
   }
 }
 

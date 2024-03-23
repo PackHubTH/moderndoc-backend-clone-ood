@@ -40,12 +40,15 @@ export const getUserById = async (
   return null
 }
 
-export const getUserDepartmentId = async (userId: string): Promise<string> => {
+export const getUserDepartmentId = async (
+  userId: string,
+  staffOnly: boolean = false
+): Promise<string> => {
   const user = await getUserById(userId)
 
   let departmentId: string | null = null
 
-  if (user && user?.role === 'STUDENT') {
+  if (user && user?.role === 'STUDENT' && !staffOnly) {
     const department = await getCourseById(user.student!.courseId!)
 
     departmentId = department!.departmentId

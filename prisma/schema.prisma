@@ -58,7 +58,8 @@ model User {
   nameTh               String             @map("nameTH")
   userCreatedDocuments Document[]         @relation("user_created_document")
   userUpdatedDocuments Document[]         @relation("user_update_document")
-  documentSents        DocumentSent[]
+  documentReceivers    DocumentSent[]     @relation("ReceiverRelation")
+  documentSenders      DocumentSent[]     @relation("SenderRelation")
   documentTimelines    DocumentTimeline[]
   userCreatedFaqs      Faq[]              @relation("user_created_faq")
   userUpdatedFaqs      Faq[]              @relation("user_updated_faq")
@@ -69,7 +70,7 @@ model User {
   teacher              Teacher?
   userCreatedTemplates Template[]         @relation("user_created_template")
   userUpdatedTemplates Template[]         @relation("user_updated_template")
-  userGroups           UserGroup[]
+  templateOperators    TemplateOperator[]
 
   @@map("user")
 }
@@ -175,52 +176,34 @@ model SubFaq {
 }
 
 model Template {
-  id             String          @id @default(uuid())
-  departmentId   String          @map("department_id")
-  title          String
-  templateFile   String          @map("template_file")
-  exampleFile    String          @map("example_file")
-  description    String
-  createdBy      String          @map("created_by")
-  updatedBy      String          @map("updated_by")
-  lastUpdatedAt  DateTime        @updatedAt @map("last_updated_at")
-  faqs           Faq[]
-  userCreated    User            @relation("user_created_template", fields: [createdBy], references: [id])
-  department     Department      @relation(fields: [departmentId], references: [id])
-  userUpdated    User            @relation("user_updated_template", fields: [updatedBy], references: [id])
-  templateGroups TemplateGroup[]
+  id            String             @id @default(uuid())
+  departmentId  String             @map("department_id")
+  title         String
+  templateFile  String             @map("template_file")
+  exampleFile   String?            @map("example_file")
+  description   String
+  createdBy     String             @map("created_by")
+  updatedBy     String             @map("updated_by")
+  lastUpdatedAt DateTime           @updatedAt @map("last_updated_at")
+  createdCount  Int                @default(0) @map("created_count")
+  element       Json
+  faqs          Faq[]
+  userCreated   User               @relation("user_created_template", fields: [createdBy], references: [id])
+  department    Department         @relation(fields: [departmentId], references: [id])
+  userUpdated   User               @relation("user_updated_template", fields: [updatedBy], references: [id])
+  operators     TemplateOperator[]
 
   @@map("template")
 }
 
-model Group {
-  id             String          @id @default(uuid())
-  name           String          @unique
-  isInternal     Boolean         @map("is_internal")
-  templateGroups TemplateGroup[]
-  userGroups     UserGroup[]
-
-  @@map("group")
-}
-
-model UserGroup {
-  userId  String @map("user_id")
-  groupId String @map("group_id")
-  group   Group  @relation(fields: [groupId], references: [id])
-  user    User   @relation(fields: [userId], references: [id])
-
-  @@id([userId, groupId])
-  @@map("user_group")
-}
-
-model TemplateGroup {
+model TemplateOperator {
   templateId String   @map("template_id")
-  groupId    String   @map("group_id")
-  group      Group    @relation(fields: [groupId], references: [id])
+  operatorId String   @map("operator_id")
+  operator   User     @relation(fields: [operatorId], references: [id])
   template   Template @relation(fields: [templateId], references: [id])
 
-  @@id([templateId, groupId])
-  @@map("template_group")
+  @@id([templateId, operatorId])
+  @@map("template_operator")
 }
 
 model Tag {
@@ -272,14 +255,16 @@ model DocumentTimeline {
 }
 
 model DocumentSent {
-  documentId String         @map("document_id")
-  receiverId String         @map("receiver_id")
+  documentId String             @map("document_id")
+  receiverId String             @map("receiver_id")
   message    String
-  isEditable Boolean        @map("is_editable")
-  status     DocumentStatus
-  sendAt     DateTime       @default(now()) @map("send_at")
-  document   Document       @relation(fields: [documentId], references: [id])
-  receiver   User           @relation(fields: [receiverId], references: [id])
+  isEditable Boolean            @map("is_editable")
+  sendAt     DateTime           @default(now()) @map("send_at")
+  senderId   String             @map("sender_id")
+  status     DocumentSentStatus
+  document   Document           @relation(fields: [documentId], references: [id])
+  receiver   User               @relation("ReceiverRelation", fields: [receiverId], references: [id])
+  sender     User               @relation("SenderRelation", fields: [senderId], references: [id])
 
   @@id([documentId, receiverId, sendAt])
   @@map("document_sent")
@@ -328,4 +313,13 @@ enum DocumentStatus {
   PUBLISHED
 
   @@map("document_status")
+}
+
+enum DocumentSentStatus {
+  SENT
+  PROCESSING
+  RETURNED
+  FORWARDED
+
+  @@map("document_sent_status")
 }
