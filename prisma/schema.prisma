@@ -318,8 +318,9 @@ enum DocumentStatus {
 enum DocumentSentStatus {
   SENT
   PROCESSING
-  RETURNED
-  FORWARDED
+  RETURNING
+  WAITING
+  COMPLETED
 
   @@map("document_sent_status")
 }

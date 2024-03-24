@@ -1,6 +1,6 @@
-import prisma from '@prisma'
-
 import { CreateTemplateParams, UpdateTemplateParams } from './types'
+
+import prisma from '@prisma'
 
 export const createTemplate = async (params: CreateTemplateParams) => {
   const template = await prisma.template.create({
@@ -12,6 +12,7 @@ export const createTemplate = async (params: CreateTemplateParams) => {
       createdBy: params.userId,
       updatedBy: params.userId,
       departmentId: params.departmentId,
+      element: params.element,
     },
   })
 

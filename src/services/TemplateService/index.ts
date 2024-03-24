@@ -1,11 +1,12 @@
+import * as TemplateRepo from 'repository/TemplateRepository'
+import * as UserService from 'services/UserService'
+
 import {
   CreateTemplateRequest,
   DeleteTemplateRequest,
   GetDepartmentTemplatesRequest,
   UpdateTemplateRequest,
 } from 'controllers/TemplateController/types'
-import * as TemplateRepo from 'repository/TemplateRepository'
-import * as UserService from 'services/UserService'
 
 export const createTemplate = async (params: CreateTemplateRequest) => {
   const departmentId = await UserService.getUserDepartmentId(
@@ -57,6 +58,8 @@ export const UpdateTemplate = async (params: UpdateTemplateRequest) => {
   const updatedTemplate = await TemplateRepo.updateTemplateById({
     ...params,
     departmentId,
+    element: {},
+    createdCount: 0,
   })
 
   return updatedTemplate
