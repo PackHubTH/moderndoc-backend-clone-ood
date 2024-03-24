@@ -1,21 +1,9 @@
-import {
-  GetObjectCommand,
-  PutObjectCommandInput,
-  S3Client,
-} from '@aws-sdk/client-s3'
+import { GetObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3'
+import { addTimeToFileName, getS3Client } from 'utils/fileUtils'
+
 import { Upload } from '@aws-sdk/lib-storage'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { addTimeToFileName } from 'utils/fileUtils'
-
 import { UploadFileResponse } from './types'
-
-const client = new S3Client({
-  region: process.env.AWS_BUCKET_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-})
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 export const uploadFile = async (
   fileContent: Buffer,
@@ -32,16 +20,20 @@ export const uploadFile = async (
     ACL: isPublic ? 'public-read' : 'private',
   }
 
+  const client = getS3Client()
+
   try {
     const parallelUpload = new Upload({
       client,
       params,
     })
 
-    await parallelUpload.done()
+    const data = await parallelUpload.done()
+    console.log('File uploaded to S3')
 
-    const actualUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${fullFileName}`
-    const result = await getFileUrl(fileName, folder)
+    const actualFileName = data.Key!.split('/').pop() as string
+    const actualUrl = data.Location!
+    const result = await getFileUrl(actualFileName, folder)
 
     return {
       fileUrl: actualUrl,
@@ -57,6 +49,7 @@ export const getFileUrl = async (fileName: string, folder: string) => {
     Bucket: process.env.AWS_BUCKET_NAME!,
     Key: folder + '/' + fileName,
   })
+  const client = getS3Client()
 
   const url = await getSignedUrl(client, command, { expiresIn: 3600 })
 
