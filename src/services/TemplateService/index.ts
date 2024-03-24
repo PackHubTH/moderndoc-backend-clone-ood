@@ -13,11 +13,11 @@ export const createTemplate = async (params: CreateTemplateRequest) => {
     params.userId,
     true
   )
-
   const template = await TemplateRepo.createTemplate({
     ...params,
     departmentId,
-    exampleFile: params.exampleFile,
+    element: {},
+    exampleFile: params.exampleFile || '',
   })
 
   return template

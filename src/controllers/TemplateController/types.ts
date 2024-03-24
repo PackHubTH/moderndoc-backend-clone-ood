@@ -5,8 +5,7 @@ export const CreateTemplateSchema = z.object({
   title: z.string(),
   description: z.string().default(''),
   templateFile: z.string().url(),
-  exampleFile: z.string().url().default(''),
-  element: z.object({}),
+  exampleFile: z.string().url().default('').optional(),
 })
 
 export type CreateTemplateRequest = z.infer<typeof CreateTemplateSchema>
