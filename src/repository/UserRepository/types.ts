@@ -17,3 +17,11 @@ export type GetUserByEmail = Prisma.UserGetPayload<{
     student: true
   }
 }>
+
+export type GetUserByDepartmentId = Prisma.UserGetPayload<{
+  select: {
+    id: true
+    nameTh: true
+    role: true
+  }
+}>
