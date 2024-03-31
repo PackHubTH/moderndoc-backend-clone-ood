@@ -16,6 +16,16 @@ export const createTemplate = async (params: CreateTemplateParams) => {
     },
   })
 
+  // TODO: catch this error
+  for (const operatorId of params.operatorId) {
+    await prisma.templateOperator.create({
+      data: {
+        templateId: template.id,
+        operatorId,
+      },
+    })
+  }
+
   return template
 }
 
@@ -65,10 +75,47 @@ export const updateTemplateById = async (params: UpdateTemplateParams) => {
       templateFile: params.templateFile,
       exampleFile: params.exampleFile,
       updatedBy: params.userId,
+      element: params.element,
     },
   })
 
-  return template
+  // Retrieve current template operators
+  const currentOperators = await prisma.templateOperator.findMany({
+    where: { templateId: params.id },
+    select: { operatorId: true },
+  })
+  // compare current operators with new operators
+  const newOperators = params.operatorId
+  const operatorsToDelete = currentOperators
+    .filter((operator) => !newOperators.includes(operator.operatorId))
+    .map((op) => op.operatorId)
+  const operatorsToAdd = newOperators.filter(
+    (operator) =>
+      !currentOperators.map((op) => op.operatorId).includes(operator)
+  )
+  // add new operators
+  for (const operatorId of operatorsToAdd) {
+    await prisma.templateOperator.create({
+      data: {
+        templateId: params.id,
+        operatorId,
+      },
+    })
+  }
+  // delete operators
+  for (const operatorId of operatorsToDelete) {
+    await prisma.templateOperator.delete({
+      where: {
+        templateId_operatorId: {
+          operatorId,
+          templateId: params.id,
+        },
+      },
+    })
+  }
+
+  // TODO: remove debug
+  return [template, currentOperators, operatorsToAdd, operatorsToDelete]
 }
 
 export const deleteTemplateById = async (id: string) => {

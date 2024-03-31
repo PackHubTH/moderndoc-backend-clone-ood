@@ -1,6 +1,3 @@
-import { Request, Response } from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { ApiResponse } from 'models/response'
 import * as TemplateService from 'services/TemplateService'
 
 import {
@@ -9,6 +6,10 @@ import {
   GetDepartmentTemplatesSchema,
   UpdateTemplateSchema,
 } from './types'
+import { Request, Response } from 'express'
+
+import { ApiResponse } from 'models/response'
+import { StatusCodes } from 'http-status-codes'
 
 export const createTemplate = async (req: Request, res: Response) => {
   try {

@@ -59,7 +59,6 @@ export const UpdateTemplate = async (params: UpdateTemplateRequest) => {
     ...params,
     departmentId,
     element: {},
-    createdCount: 0,
   })
 
   return updatedTemplate

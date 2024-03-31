@@ -1,4 +1,4 @@
-import { Prisma, Template } from '@prisma/client'
+import { Prisma, Template, TemplateOperator } from '@prisma/client'
 
 export type CreateTemplateParams = Omit<
   Template,
@@ -6,11 +6,14 @@ export type CreateTemplateParams = Omit<
 > & {
   userId: string
   element: Prisma.InputJsonValue
+  operatorId: string[]
 }
 
 export type UpdateTemplateParams = Omit<
   Template,
-  'lastUpdatedAt' | 'updatedBy' | 'createdBy'
+  'lastUpdatedAt' | 'updatedBy' | 'createdBy' | 'createdCount'
 > & {
   userId: string
+  element: Prisma.InputJsonValue
+  operatorId: string[]
 }

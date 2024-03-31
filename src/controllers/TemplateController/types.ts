@@ -4,8 +4,9 @@ export const CreateTemplateSchema = z.object({
   userId: z.string().uuid(),
   title: z.string(),
   description: z.string().default(''),
-  templateFile: z.string().url(),
   exampleFile: z.string().url().default('').optional(),
+  operatorId: z.array(z.string().uuid()),
+  templateFile: z.string().url(),
 })
 
 export type CreateTemplateRequest = z.infer<typeof CreateTemplateSchema>
@@ -17,6 +18,7 @@ export const UpdateTemplateSchema = z.object({
   description: z.string().default(''),
   templateFile: z.string().url(),
   exampleFile: z.string().url().default(''),
+  operatorId: z.array(z.string().uuid()),
 })
 
 export type UpdateTemplateRequest = z.infer<typeof UpdateTemplateSchema>
