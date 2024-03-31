@@ -2,6 +2,7 @@ import * as TemplateRepo from 'repository/TemplateRepository'
 import * as UserService from 'services/UserService'
 
 import {
+  CopyTemplateRequest,
   CreateTemplateRequest,
   DeleteTemplateRequest,
   GetDepartmentTemplatesRequest,
@@ -83,4 +84,19 @@ export const DeleteTemplate = async (params: DeleteTemplateRequest) => {
   await TemplateRepo.deleteTemplateById(params.id)
 
   return true
+}
+
+export const copyTemplate = async (params: CopyTemplateRequest) => {
+  const template = await TemplateRepo.getTemplateById(params.id)
+
+  if (!template) {
+    throw new Error('Template not found')
+  }
+
+  const copiedTemplate = await TemplateRepo.copyTemplate(
+    params.id,
+    params.userId
+  )
+
+  return copiedTemplate
 }

@@ -114,3 +114,48 @@ export const deleteTemplateById = async (id: string) => {
 
   return [template, templateOperators]
 }
+
+export const copyTemplate = async (id: string, userId: string) => {
+  const template = await prisma.template.findUnique({
+    where: {
+      id,
+    },
+  })
+
+  if (!template) {
+    throw new Error('Template not found')
+  }
+
+  // TODO: update unique name
+  const newTemplate = await prisma.template.create({
+    data: {
+      title: template.title,
+      description: template.description,
+      templateFile: template.templateFile,
+      exampleFile: template.exampleFile,
+      createdBy: userId,
+      updatedBy: userId,
+      departmentId: template.departmentId,
+      element: {},
+    },
+  })
+
+  const templateOperators = await prisma.templateOperator.findMany({
+    where: {
+      templateId: id,
+    },
+  })
+
+  await Promise.all(
+    templateOperators.map((templateOperator) =>
+      prisma.templateOperator.create({
+        data: {
+          templateId: newTemplate.id,
+          operatorId: templateOperator.operatorId,
+        },
+      })
+    )
+  )
+
+  return newTemplate
+}

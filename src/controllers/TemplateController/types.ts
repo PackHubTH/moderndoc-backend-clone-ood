@@ -45,3 +45,10 @@ export const GetTemplateByIdSchema = z.object({
 })
 
 export type GetTemplateByIdRequest = z.infer<typeof GetTemplateByIdSchema>
+
+export const CopyTemplateSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+})
+
+export type CopyTemplateRequest = z.infer<typeof CopyTemplateSchema>

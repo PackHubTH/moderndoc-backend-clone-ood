@@ -114,3 +114,29 @@ export const deleteTemplate = async (req: Request, res: Response) => {
     return res.status(StatusCodes.BAD_REQUEST).json(response)
   }
 }
+
+export const copyTemplate = async (req: Request, res: Response) => {
+  try {
+    const request = await DeleteTemplateSchema.parseAsync({
+      id: req.params.id,
+      ...req.headers,
+    })
+
+    const template = await TemplateService.copyTemplate(request)
+
+    const response: ApiResponse<null> = {
+      data: template,
+      message: 'Successfully copied template',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: error as string,
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
