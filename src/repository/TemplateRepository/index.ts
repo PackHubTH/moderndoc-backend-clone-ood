@@ -78,44 +78,26 @@ export const updateTemplateById = async (params: UpdateTemplateParams) => {
       element: params.element,
     },
   })
-
-  // Retrieve current template operators
-  const currentOperators = await prisma.templateOperator.findMany({
-    where: { templateId: params.id },
-    select: { operatorId: true },
+  // delete all operators
+  const deletedOperators = await prisma.templateOperator.deleteMany({
+    where: {
+      templateId: params.id,
+    },
   })
-  // compare current operators with new operators
-  const newOperators = params.operatorId
-  const operatorsToDelete = currentOperators
-    .filter((operator) => !newOperators.includes(operator.operatorId))
-    .map((op) => op.operatorId)
-  const operatorsToAdd = newOperators.filter(
-    (operator) =>
-      !currentOperators.map((op) => op.operatorId).includes(operator)
-  )
   // add new operators
-  for (const operatorId of operatorsToAdd) {
-    await prisma.templateOperator.create({
-      data: {
-        templateId: params.id,
-        operatorId,
-      },
-    })
-  }
-  // delete operators
-  for (const operatorId of operatorsToDelete) {
-    await prisma.templateOperator.delete({
-      where: {
-        templateId_operatorId: {
-          operatorId,
+  const addedOperators = await Promise.all(
+    params.operatorId.map((operatorId) =>
+      prisma.templateOperator.create({
+        data: {
           templateId: params.id,
+          operatorId,
         },
-      },
-    })
-  }
+      })
+    )
+  )
 
   // TODO: remove debug
-  return [template, currentOperators, operatorsToAdd, operatorsToDelete]
+  return [template, deletedOperators, addedOperators]
 }
 
 export const deleteTemplateById = async (id: string) => {
@@ -124,6 +106,11 @@ export const deleteTemplateById = async (id: string) => {
       id,
     },
   })
+  const templateOperators = await prisma.templateOperator.deleteMany({
+    where: {
+      templateId: id,
+    },
+  })
 
-  return template
+  return [template, templateOperators]
 }
