@@ -82,3 +82,9 @@ export const DeleteTemplate = async (params: DeleteTemplateRequest) => {
 
   return true
 }
+
+export const getTemplateById = async (id: string) => {
+  const template = await TemplateRepo.getTemplateById(id)
+
+  return template
+}

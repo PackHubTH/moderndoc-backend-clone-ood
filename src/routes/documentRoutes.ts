@@ -1,11 +1,22 @@
+import {
+  createDocument,
+  documentAction,
+  getDocumentById,
+  getDocumentList,
+  sendDocumentToOperator,
+} from 'controllers/DocumentController'
 import Router from 'express'
+import { validateToken } from 'middlewares/validateToken'
 
 const document = Router()
 
-// document.post('/',createDocument)
+document.post('/', validateToken, createDocument)
+document.post('/assign-operator', validateToken, sendDocumentToOperator)
+document.post('/action', validateToken, documentAction)
+
+document.get('/', validateToken, getDocumentList)
+document.get('/:documentId', validateToken, getDocumentById)
 // document.put('/:id',updateDocument)
-// document.get('/:id',getDocumentById)
-// document.get('/user/:id',getUserDocuments)
 // document.post('/share-document',shareDocument)
 // document.get('/timeline',getAllDocumentsTimeline)
 

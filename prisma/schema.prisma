@@ -57,6 +57,7 @@ model User {
   nameEn               String             @map("nameEN")
   nameTh               String             @map("nameTH")
   userCreatedDocuments Document[]         @relation("user_created_document")
+  documents            Document[]
   userUpdatedDocuments Document[]         @relation("user_update_document")
   documentReceivers    DocumentSent[]     @relation("ReceiverRelation")
   documentSenders      DocumentSent[]     @relation("SenderRelation")
@@ -234,7 +235,10 @@ model Document {
   createdBy         String             @map("created_by")
   updatedBy         String             @map("updated_by")
   lastUpdatedAt     DateTime           @updatedAt @map("last_updated_at")
+  operatorId        String?            @map("operator_id")
+  description       String             @default("")
   userCreated       User               @relation("user_created_document", fields: [createdBy], references: [id])
+  operator          User?              @relation(fields: [operatorId], references: [id])
   userUpdated       User               @relation("user_update_document", fields: [updatedBy], references: [id])
   documentSents     DocumentSent[]
   documentTimelines DocumentTimeline[]
@@ -243,30 +247,32 @@ model Document {
 }
 
 model DocumentTimeline {
-  documentId    String   @map("document_id")
+  documentId    String             @map("document_id")
   message       String
-  updatedBy     String   @map("updated_by")
-  createdAt     DateTime @default(now()) @map("created_at")
-  document      Document @relation(fields: [documentId], references: [id])
-  userUpdatedBy User     @relation(fields: [updatedBy], references: [id])
+  updatedBy     String             @map("updated_by")
+  createdAt     DateTime           @default(now()) @map("created_at")
+  userId        String             @map("user_id")
+  id            String             @id @default(uuid())
+  status        DocumentSentStatus
+  document      Document           @relation(fields: [documentId], references: [id])
+  userUpdatedBy User               @relation(fields: [updatedBy], references: [id])
 
-  @@id([documentId, updatedBy])
   @@map("document_timeline")
 }
 
 model DocumentSent {
   documentId String             @map("document_id")
   receiverId String             @map("receiver_id")
-  message    String
   isEditable Boolean            @map("is_editable")
   sendAt     DateTime           @default(now()) @map("send_at")
   senderId   String             @map("sender_id")
   status     DocumentSentStatus
+  id         String             @id @default(uuid())
   document   Document           @relation(fields: [documentId], references: [id])
   receiver   User               @relation("ReceiverRelation", fields: [receiverId], references: [id])
   sender     User               @relation("SenderRelation", fields: [senderId], references: [id])
 
-  @@id([documentId, receiverId, sendAt])
+  @@unique([documentId, receiverId, sendAt])
   @@map("document_sent")
 }
 
@@ -310,7 +316,9 @@ enum StaffType {
 
 enum DocumentStatus {
   DRAFT
-  PUBLISHED
+  PROCESSING
+  COMPLETED
+  CANCELED
 
   @@map("document_status")
 }
@@ -318,8 +326,10 @@ enum DocumentStatus {
 enum DocumentSentStatus {
   SENT
   PROCESSING
-  RETURNED
-  FORWARDED
+  RETURNING
+  WAITING
+  COMPLETED
+  CANCELED
 
   @@map("document_sent_status")
 }

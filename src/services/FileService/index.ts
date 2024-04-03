@@ -38,10 +38,11 @@ export const uploadFile = async (
       params,
     })
 
-    await parallelUpload.done()
+    const data = await parallelUpload.done()
 
-    const actualUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${fullFileName}`
-    const result = await getFileUrl(fileName, folder)
+    const actualFileName = data.Key!.split('/').pop() as string
+    const actualUrl = data.Location!
+    const result = await getFileUrl(actualFileName, folder)
 
     return {
       fileUrl: actualUrl,

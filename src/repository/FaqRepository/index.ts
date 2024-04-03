@@ -239,3 +239,13 @@ export const deleteFaqById = async (id: string) => {
     },
   })
 }
+
+export const getFaqsByTemplateId = async (templateId: string) => {
+  const faqs = await prisma.faq.findMany({
+    where: {
+      templateId,
+    },
+  })
+
+  return faqs
+}

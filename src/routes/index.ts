@@ -5,6 +5,7 @@ import { validateToken } from 'middlewares/validateToken'
 
 import courseRoutes from './courseRoutes'
 import departmentRoutes from './departmentRoutes'
+import documentRoutes from './documentRoutes'
 import facultyRoutes from './facultyRoutes'
 import faqRoutes from './faqRoutes'
 import tagRoutes from './tagRoutes'
@@ -20,7 +21,7 @@ routes.use('/course', courseRoutes)
 routes.use('/tag', tagRoutes)
 routes.use('/faq', faqRoutes)
 routes.use('/template', templateRoutes)
-
+routes.use('/document', documentRoutes)
 routes.post('/upload-file', [validateToken, upload.single('file'), uploadFile])
 
 export default routes

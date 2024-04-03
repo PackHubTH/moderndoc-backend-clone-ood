@@ -9,6 +9,7 @@ export const createTemplate = async (params: CreateTemplateParams) => {
       description: params.description,
       templateFile: params.templateFile,
       exampleFile: params.exampleFile,
+      element: params.element ?? {},
       createdBy: params.userId,
       updatedBy: params.userId,
       departmentId: params.departmentId,
