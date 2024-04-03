@@ -3,10 +3,13 @@ import { Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { ApiResponse } from 'models/response'
 import * as DepartmentRepository from 'repository/DepartmentRepository'
+import * as DepartmentService from 'services/DepartmentService'
 
 import {
   addAgencyDepartmentRequestSchema,
+  approveDepartmentMemberRequestSchema,
   getDepartmentByIdRequestSchema,
+  getDepartmentMembersRequestSchema,
   getDepartmentsByFacultyIdRequestSchema,
   updateDepartmentRequestSchema,
 } from './types'
@@ -106,6 +109,57 @@ export const updateDepartment = async (req: Request, res: Response) => {
     const response: ApiResponse<null> = {
       data: null,
       message: 'Failed to update department',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const getDepartmentMembers = async (req: Request, res: Response) => {
+  try {
+    const request = await getDepartmentMembersRequestSchema.parseAsync({
+      ...req.query,
+      userId: req.headers.userId,
+      isApproved: req.query.isApproved === 'true',
+    })
+
+    const users = await DepartmentService.getDepartmentMembers(request)
+
+    const response: ApiResponse<unknown> = {
+      data: users,
+      message: 'Successfully retrieved department members',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Failed to retrieve department members',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const approveDepartmentMember = async (req: Request, res: Response) => {
+  try {
+    const request = await approveDepartmentMemberRequestSchema.parseAsync({
+      ...req.body,
+      userId: req.headers.userId,
+    })
+
+    const response: ApiResponse<unknown> = {
+      data: await DepartmentService.approveDepartmentMember(request),
+      message: 'Successfully approved department member',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Failed to approve department member',
       error: error,
     }
     return res.status(StatusCodes.BAD_REQUEST).json(response)
