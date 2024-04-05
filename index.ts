@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import express, { Application } from 'express'
 
 import routes from './src/routes'
+import { sendEmail } from 'services/EmailService'
 
 dotenv.config()
 
