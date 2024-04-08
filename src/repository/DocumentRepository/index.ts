@@ -403,3 +403,36 @@ export const updateDocumentElement = async (
 
   return document
 }
+
+export const getUserTimelines = async (userId: string, page: number = 1) => {
+  const totalTimelineCount = await prisma.documentTimeline.count({
+    where: {
+      userId,
+    },
+  })
+  const totalPages = Math.ceil(totalTimelineCount / 10)
+  const timelines = await prisma.documentTimeline.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      document: {
+        select: {
+          title: true,
+          description: true,
+        },
+      },
+    },
+    skip: (page - 1) * 10,
+    take: 10,
+    orderBy: {
+      createdAt: 'desc',
+    },
+  })
+
+  return {
+    data: timelines,
+    totalPages: totalPages,
+    total: totalTimelineCount,
+  }
+}

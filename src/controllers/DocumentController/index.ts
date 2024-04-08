@@ -10,6 +10,7 @@ import {
   DocumentSentToOperatorRequestSchema,
   GetDocumentByIdRequestSchema,
   GetDocumentListRequestSchema,
+  getUserTimelinesRequestSchema,
 } from './types'
 
 export const createDocument = async (req: Request, res: Response) => {
@@ -139,6 +140,31 @@ export const documentAction = async (req: Request, res: Response) => {
     const response: ApiResponse<null> = {
       data: null,
       message: 'Failed to perform document action',
+      error: error,
+    }
+
+    res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const getUserTimelines = async (req: Request, res: Response) => {
+  try {
+    const { userId, page } = await getUserTimelinesRequestSchema.parseAsync({
+      page: Number(req.query.page),
+      userId: req.headers.userId,
+    })
+    const timelines = await DocumentService.getUserTimelines(userId, page)
+
+    const response: ApiResponse<Document[]> = {
+      data: timelines,
+      message: 'Timelines fetched successfully',
+    }
+
+    res.json(response).status(StatusCodes.OK)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Failed to fetch timelines',
       error: error,
     }
 

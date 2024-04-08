@@ -517,3 +517,7 @@ export const getDocumentById = async (userId: string, documentId: string) => {
 
   return document
 }
+
+export const getUserTimelines = async (userId: string, page: number = 1) => {
+  return await DocumentRepo.getUserTimelines(userId, page)
+}

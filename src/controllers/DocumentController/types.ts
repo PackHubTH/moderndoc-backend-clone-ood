@@ -66,3 +66,8 @@ export const GetDocumentByIdRequestSchema = z.object({
   userId: z.string().uuid(),
   documentId: z.string().uuid(),
 })
+
+export const getUserTimelinesRequestSchema = z.object({
+  userId: z.string().uuid(),
+  page: z.number().default(1),
+})
