@@ -1,5 +1,6 @@
 import { CreateTemplateParams, UpdateTemplateParams } from './types'
 
+import { getUsersByDepartmentId } from 'repository/UserRepository'
 import prisma from '@prisma'
 
 export const createTemplate = async (params: CreateTemplateParams) => {
@@ -17,7 +18,20 @@ export const createTemplate = async (params: CreateTemplateParams) => {
   })
 
   // TODO: catch this error
-  for (const operatorId of params.operatorId) {
+  let operatorIds: string[] = []
+  if (params.operatorGroup === '') {
+    operatorIds = (await getUsersByDepartmentId(params.departmentId)).map(
+      (user) => user.id
+    ) as string[]
+  } else if (params.operatorGroup !== '' && params.operatorId.length === 0) {
+    operatorIds = (await getUsersByDepartmentId(params.operatorGroup)).map(
+      (user) => user.id
+    ) as string[]
+  } else if (params.operatorId.length > 0) {
+    operatorIds = params.operatorId
+  }
+
+  for (const operatorId of operatorIds) {
     await prisma.templateOperator.create({
       data: {
         templateId: template.id,
@@ -129,7 +143,7 @@ export const copyTemplate = async (id: string, userId: string) => {
   // TODO: update unique name
   const newTemplate = await prisma.template.create({
     data: {
-      title: template.title,
+      title: template.title + ' copy',
       description: template.description,
       templateFile: template.templateFile,
       exampleFile: template.exampleFile,

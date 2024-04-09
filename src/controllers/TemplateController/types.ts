@@ -6,6 +6,7 @@ export const CreateTemplateSchema = z.object({
   description: z.string().default(''),
   exampleFile: z.string().url().default('').optional(),
   operatorId: z.array(z.string().uuid()),
+  operatorGroup: z.string(),
   templateFile: z.string().url(),
 })
 

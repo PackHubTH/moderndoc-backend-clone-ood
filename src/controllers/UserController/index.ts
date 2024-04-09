@@ -1,3 +1,4 @@
+import * as DepartmentRepository from './../../repository/DepartmentRepository/index'
 import * as StaffRepository from './../../repository/StaffRepository/index'
 import * as TeacherRepository from './../../repository/TeacherRepository/index'
 import * as UserRepository from './../../repository/UserRepository/index'
@@ -269,26 +270,46 @@ export const getUser = async (req: Request, res: Response) => {
 }
 
 export const getUsersByDepartmentId = async (req: Request, res: Response) => {
-  const getUsersByDepartmentIdSchema = z.string()
+  const getUsersByDepartmentIdSchema = z.string().uuid()
   try {
     const departmentId = await getUsersByDepartmentIdSchema.parseAsync(
       req.params.id
     )
     console.log('departmentId', departmentId)
 
-    // const teachers =
-    //   await TeacherRepository.getTeacherByDepartmentId(departmentId)
-
-    // const staffs = await StaffRepository.getStaffByDepartmentId(departmentId)
     const users = await UserRepository.getUsersByDepartmentId(departmentId)
 
-    // const users = await TeacherRepository.getUsersByDepartmentId(departmentId)
+    const response = {
+      data: users,
+      message: 'Successfully retrieved users',
+      error: null,
+    }
 
-    // const response: ApiResponse<User[]> = {
-    //   data: users,
-    //   message: 'Successfully retrieved users',
-    //   error: null,
-    // }
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Invalid request body',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const getUsersByAllAgency = async (req: Request, res: Response) => {
+  try {
+    const departments = await DepartmentRepository.getAllAgencyDepartments()
+
+    const usersByDepartment = await Promise.all(
+      departments.map((department) =>
+        UserRepository.getUsersByDepartmentId(department.id)
+      )
+    )
+    const users = departments.map((department, index) => ({
+      departmentId: department.id,
+      users: usersByDepartment[index],
+    }))
+
     const response = {
       data: users,
       message: 'Successfully retrieved users',

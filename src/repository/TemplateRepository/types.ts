@@ -7,6 +7,7 @@ export type CreateTemplateParams = Omit<
   userId: string
   element: Prisma.InputJsonValue
   operatorId: string[]
+  operatorGroup: string
 }
 
 export type UpdateTemplateParams = Omit<

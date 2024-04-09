@@ -1,10 +1,9 @@
-import prisma from '@prisma'
+import { GetUserById } from './types'
 import { getCourseById } from 'repository/CourseRepository'
 import { getStaffByUserId } from 'repository/StaffRepository'
 import { getStudentByUserId } from 'repository/StudentRepository'
 import { getTeacherByUserId } from 'repository/TeacherRepository'
-
-import { GetUserById } from './types'
+import prisma from '@prisma'
 
 export const getUserById = async (
   userId: string
