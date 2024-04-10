@@ -42,17 +42,22 @@ export const approveDepartmentMember = async (
 
   switch (member.role) {
     case Role.STUDENT:
-      return await DepartmentRepo.approveStudentMember(member.student!.id)
+      return await DepartmentRepo.approveStudentMember(
+        member.student!.id,
+        params.isApproved
+      )
 
     case Role.STAFF:
       return await DepartmentRepo.approveStaffMember(
         member.staff!.id,
-        departmentId
+        departmentId,
+        params.isApproved
       )
     case Role.TEACHER:
       return await DepartmentRepo.approveTeacherMember(
         member.staff!.id,
-        departmentId
+        departmentId,
+        params.isApproved
       )
     default:
       throw new Error('Invalid role')

@@ -138,6 +138,23 @@ export const getDepartmentMembers = async (
         },
       ],
     },
+    include: {
+      student: {
+        select: {
+          studentNumber: true,
+        },
+      },
+      staff: {
+        select: {
+          staffNumber: true,
+        },
+      },
+      teacher: {
+        select: {
+          staffNumber: true,
+        },
+      },
+    },
     skip: (page - 1) * 10,
     take: 10,
   })
@@ -149,61 +166,119 @@ export const getDepartmentMembers = async (
   }
 }
 
-export const approveStudentMember = async (studentId: string) => {
-  const student = await prisma.student.update({
-    where: {
-      id: studentId,
-    },
-    data: {
-      isApproved: true,
-    },
-  })
+export const approveStudentMember = async (
+  studentId: string,
+  isApproved: boolean
+) => {
+  if (isApproved) {
+    const student = await prisma.student.update({
+      where: {
+        id: studentId,
+      },
+      data: {
+        isApproved: true,
+      },
+    })
 
-  return student
+    return student
+  }
+
+  if (!isApproved) {
+    const student = await prisma.student.update({
+      where: {
+        id: studentId,
+      },
+      data: {
+        isApproved: false,
+        courseId: null,
+      },
+    })
+
+    return student
+  }
 }
-
 export const approveStaffMember = async (
   staffId: string,
-  departmentId: string
+  departmentId: string,
+  isApproved: boolean
 ) => {
-  const staffDepartment = await prisma.staffDepartment.findFirst({
-    where: {
-      departmentId,
-      staffId: staffId,
-    },
-  })
+  if (isApproved) {
+    const staffDepartment = await prisma.staffDepartment.findFirst({
+      where: {
+        departmentId,
+        staffId: staffId,
+      },
+    })
 
-  const updatedStaffDepartment = await prisma.staffDepartment.update({
-    where: {
-      id: staffDepartment?.id,
-    },
-    data: {
-      isApproved: true,
-    },
-  })
+    const updatedStaffDepartment = await prisma.staffDepartment.update({
+      where: {
+        id: staffDepartment?.id,
+      },
+      data: {
+        isApproved: true,
+      },
+    })
 
-  return updatedStaffDepartment
+    return updatedStaffDepartment
+  }
+
+  if (!isApproved) {
+    const staffDepartment = await prisma.staffDepartment.findFirst({
+      where: {
+        departmentId,
+        staffId: staffId,
+      },
+    })
+
+    const updatedStaffDepartment = await prisma.staffDepartment.delete({
+      where: {
+        id: staffDepartment?.id,
+      },
+    })
+
+    return updatedStaffDepartment
+  }
 }
 
 export const approveTeacherMember = async (
   teacherId: string,
-  departmentId: string
+  departmentId: string,
+  isApproved: boolean
 ) => {
-  const teacherDepartment = await prisma.teacherDepartment.findFirst({
-    where: {
-      departmentId,
-      teacherId: teacherId,
-    },
-  })
+  if (isApproved) {
+    const teacherDepartment = await prisma.teacherDepartment.findFirst({
+      where: {
+        departmentId,
+        teacherId: teacherId,
+      },
+    })
 
-  const updatedTeacherDepartment = await prisma.teacherDepartment.update({
-    where: {
-      id: teacherDepartment?.id,
-    },
-    data: {
-      isApproved: true,
-    },
-  })
+    const updatedTeacherDepartment = await prisma.teacherDepartment.update({
+      where: {
+        id: teacherDepartment?.id,
+      },
+      data: {
+        isApproved: true,
+      },
+    })
 
-  return updatedTeacherDepartment
+    return updatedTeacherDepartment
+  }
+
+  if (!isApproved) {
+    const teacherDepartment = await prisma.teacherDepartment.findFirst({
+      where: {
+        departmentId,
+        teacherId: teacherId,
+      },
+    })
+
+    const updatedTeacherDepartment = await prisma.teacherDepartment.delete({
+      where: {
+        id: teacherDepartment?.id,
+      },
+    })
+
+    return updatedTeacherDepartment
+  }
 }
