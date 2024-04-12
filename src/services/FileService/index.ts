@@ -1,21 +1,9 @@
-import {
-  GetObjectCommand,
-  PutObjectCommandInput,
-  S3Client,
-} from '@aws-sdk/client-s3'
+import { GetObjectCommand, PutObjectCommandInput } from '@aws-sdk/client-s3'
 import { Upload } from '@aws-sdk/lib-storage'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { addTimeToFileName } from 'utils/fileUtils'
+import { addTimeToFileName, getS3Client } from 'utils/fileUtils'
 
 import { UploadFileResponse } from './types'
-
-const client = new S3Client({
-  region: process.env.AWS_BUCKET_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-})
 
 export const uploadFile = async (
   fileContent: Buffer,
@@ -31,6 +19,8 @@ export const uploadFile = async (
     Body: fileContent,
     ACL: isPublic ? 'public-read' : 'private',
   }
+
+  const client = getS3Client()
 
   try {
     const parallelUpload = new Upload({
@@ -58,6 +48,7 @@ export const getFileUrl = async (fileName: string, folder: string) => {
     Bucket: process.env.AWS_BUCKET_NAME!,
     Key: folder + '/' + fileName,
   })
+  const client = getS3Client()
 
   const url = await getSignedUrl(client, command, { expiresIn: 3600 })
 

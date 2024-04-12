@@ -7,6 +7,7 @@ import {
   CreateTemplateSchema,
   DeleteTemplateSchema,
   GetDepartmentTemplatesSchema,
+  GetOperatorsByTemplateIdSchema,
   UpdateTemplateSchema,
 } from './types'
 
@@ -100,6 +101,57 @@ export const deleteTemplate = async (req: Request, res: Response) => {
     const response: ApiResponse<null> = {
       data: null,
       message: 'Successfully deleted template',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: error as string,
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const copyTemplate = async (req: Request, res: Response) => {
+  try {
+    const request = await DeleteTemplateSchema.parseAsync({
+      id: req.params.id,
+      ...req.headers,
+    })
+
+    const template = await TemplateService.copyTemplate(request)
+
+    const response: ApiResponse<null> = {
+      data: template,
+      message: 'Successfully copied template',
+      error: null,
+    }
+
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: error as string,
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const getOperatorsByTemplateId = async (req: Request, res: Response) => {
+  try {
+    const { templateId } = await GetOperatorsByTemplateIdSchema.parseAsync({
+      templateId: req.params.templateId,
+    })
+
+    const operators = await TemplateService.getOperatorsByTemplateId(templateId)
+
+    const response: ApiResponse<unknown> = {
+      data: operators,
+      message: 'Successfully fetched operators',
       error: null,
     }
 

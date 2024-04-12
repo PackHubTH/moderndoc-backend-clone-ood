@@ -4,8 +4,10 @@ export const CreateTemplateSchema = z.object({
   userId: z.string().uuid(),
   title: z.string(),
   description: z.string().default(''),
+  exampleFile: z.string().url().default('').optional(),
+  operatorId: z.array(z.string().uuid()),
   templateFile: z.string().url(),
-  exampleFile: z.string().url().default(''),
+  element: z.any(),
 })
 
 export type CreateTemplateRequest = z.infer<typeof CreateTemplateSchema>
@@ -17,6 +19,8 @@ export const UpdateTemplateSchema = z.object({
   description: z.string().default(''),
   templateFile: z.string().url(),
   exampleFile: z.string().url().default(''),
+  operatorId: z.array(z.string().uuid()),
+  element: z.any(),
 })
 
 export type UpdateTemplateRequest = z.infer<typeof UpdateTemplateSchema>
@@ -43,3 +47,14 @@ export const GetTemplateByIdSchema = z.object({
 })
 
 export type GetTemplateByIdRequest = z.infer<typeof GetTemplateByIdSchema>
+
+export const CopyTemplateSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+})
+
+export type CopyTemplateRequest = z.infer<typeof CopyTemplateSchema>
+
+export const GetOperatorsByTemplateIdSchema = z.object({
+  templateId: z.string().uuid(),
+})

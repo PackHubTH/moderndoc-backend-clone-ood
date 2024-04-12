@@ -1,7 +1,7 @@
+import { AddUserParams, GetUserByDepartmentId, GetUserByEmail } from './types'
+
 import Prisma from '@prisma'
 import type { User } from '@prisma/client'
-
-import { AddUserParams, GetUserByEmail } from './types'
 
 export const getUserById = async (id: string): Promise<User> => {
   const user = await Prisma.user.findFirst({
@@ -79,4 +79,40 @@ export const updateUser = async (user: User): Promise<User> => {
   })
 
   return updatedUser
+}
+
+export const getUsersByDepartmentId = async (
+  departmentId: string
+): Promise<GetUserByDepartmentId[]> => {
+  const users = await Prisma.user.findMany({
+    select: {
+      id: true,
+      nameTh: true,
+      role: true,
+    },
+    where: {
+      OR: [
+        {
+          teacher: {
+            teacherDepartments: {
+              some: {
+                departmentId,
+              },
+            },
+          },
+        },
+        {
+          staff: {
+            staffDepartments: {
+              some: {
+                departmentId,
+              },
+            },
+          },
+        },
+      ],
+    },
+  })
+
+  return users
 }

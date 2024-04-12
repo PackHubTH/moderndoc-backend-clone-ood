@@ -1,4 +1,5 @@
 import {
+  CopyTemplateRequest,
   CreateTemplateRequest,
   DeleteTemplateRequest,
   GetDepartmentTemplatesRequest,
@@ -12,11 +13,11 @@ export const createTemplate = async (params: CreateTemplateRequest) => {
     params.userId,
     true
   )
-
   const template = await TemplateRepo.createTemplate({
     ...params,
     departmentId,
-    exampleFile: params.exampleFile,
+    element: params.element,
+    exampleFile: params.exampleFile || '',
   })
 
   return template
@@ -57,6 +58,7 @@ export const UpdateTemplate = async (params: UpdateTemplateRequest) => {
   const updatedTemplate = await TemplateRepo.updateTemplateById({
     ...params,
     departmentId,
+    element: params.element,
   })
 
   return updatedTemplate
@@ -87,4 +89,24 @@ export const getTemplateById = async (id: string) => {
   const template = await TemplateRepo.getTemplateById(id)
 
   return template
+}
+
+export const copyTemplate = async (params: CopyTemplateRequest) => {
+  const template = await TemplateRepo.getTemplateById(params.id)
+
+  if (!template) {
+    throw new Error('Template not found')
+  }
+
+  const copiedTemplate = await TemplateRepo.copyTemplate(
+    params.id,
+    params.userId
+  )
+
+  return copiedTemplate
+}
+
+export const getOperatorsByTemplateId = async (templateId: string) => {
+  const operators = await TemplateRepo.getOperatorsByTemplateId(templateId)
+  return operators
 }
