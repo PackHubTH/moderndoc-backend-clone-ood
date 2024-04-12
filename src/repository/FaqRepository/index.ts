@@ -99,17 +99,50 @@ export const getAllFaq = async () => {
 
 export const getAllPublicFaqs = async (
   departmentId: string,
-  page: number = 1
+  page: number = 1,
+  search: string
 ) => {
   const totalFaqsCount = await prisma.faq.count({
     where: {
-      OR: [{ departmentId }, { isInternal: false }],
+      AND: [
+        { OR: [{ departmentId }, { isInternal: false }] },
+        {
+          OR: [
+            {
+              titleTh: {
+                contains: search,
+              },
+            },
+            {
+              titleEn: {
+                contains: search,
+              },
+            },
+          ],
+        },
+      ],
     },
   })
   const totalPages = Math.ceil(totalFaqsCount / 10)
   const faqs = await prisma.faq.findMany({
     where: {
-      OR: [{ departmentId }, { isInternal: false }],
+      AND: [
+        { OR: [{ departmentId }, { isInternal: false }] },
+        {
+          OR: [
+            {
+              titleTh: {
+                contains: search,
+              },
+            },
+            {
+              titleEn: {
+                contains: search,
+              },
+            },
+          ],
+        },
+      ],
     },
     include: {
       subFaqs: true,
@@ -145,17 +178,42 @@ export const getAllPublicFaqs = async (
 
 export const getAllDepartmentFaqs = async (
   departmentId: string,
-  page: number = 1
+  page: number = 1,
+  search: string
 ) => {
   const totalFaqsCount = await prisma.faq.count({
     where: {
       departmentId,
+      OR: [
+        {
+          titleTh: {
+            contains: search,
+          },
+        },
+        {
+          titleEn: {
+            contains: search,
+          },
+        },
+      ],
     },
   })
   const totalPages = Math.ceil(totalFaqsCount / 10)
   const faqs = await prisma.faq.findMany({
     where: {
       departmentId,
+      OR: [
+        {
+          titleTh: {
+            contains: search,
+          },
+        },
+        {
+          titleEn: {
+            contains: search,
+          },
+        },
+      ],
     },
     include: {
       subFaqs: true,
@@ -163,6 +221,9 @@ export const getAllDepartmentFaqs = async (
         include: {
           tag: true,
         },
+      },
+      template: {
+        select: { title: true, description: true },
       },
       department: true,
       userUpdated: {

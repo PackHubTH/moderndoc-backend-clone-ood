@@ -1,6 +1,7 @@
 import {
   createFaq,
   createSubFaq,
+  deleteFaq,
   deleteSubFaq,
   getAllFaqs,
   getDepartmentFaqs,
@@ -18,6 +19,8 @@ faq.put('/', validateToken, updateFaq)
 faq.post('/sub-faq', validateToken, createSubFaq)
 faq.put('/sub-faq', validateToken, updateSubFaq)
 faq.delete('/sub-faq/:subFaqId', validateToken, deleteSubFaq)
+
+faq.delete('/:id', validateToken, deleteFaq)
 
 faq.get('/', validateToken, getAllFaqs)
 faq.get('/department', validateToken, getDepartmentFaqs)

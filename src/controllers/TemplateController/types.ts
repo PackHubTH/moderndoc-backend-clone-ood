@@ -35,6 +35,7 @@ export type DeleteTemplateRequest = z.infer<typeof DeleteTemplateSchema>
 export const GetDepartmentTemplatesSchema = z.object({
   userId: z.string().uuid(),
   page: z.number().default(1),
+  search: z.string().optional().default(''),
 })
 
 export type GetDepartmentTemplatesRequest = z.infer<

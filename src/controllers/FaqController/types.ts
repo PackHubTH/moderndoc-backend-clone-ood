@@ -23,6 +23,7 @@ export type CreateFaqRequest = z.infer<typeof CreateFaqRequestSchema>
 export const GetAllFaqsRequestSchema = z.object({
   userId: z.string().uuid(),
   page: z.number().default(1),
+  search: z.string().optional().default(''),
 })
 
 export const CreateSubFaqRequestSchema = z.object({

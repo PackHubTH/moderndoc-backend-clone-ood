@@ -42,6 +42,7 @@ export const getDepartmentTemplates = async (req: Request, res: Response) => {
     const request = await GetDepartmentTemplatesSchema.parseAsync({
       ...req.headers,
       page: Number(req.query.page),
+      search: req.query.search as string,
     })
 
     const templates = await TemplateService.GetDepartmentTemplates(request)

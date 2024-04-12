@@ -84,18 +84,34 @@ export const updateFaq = async (params: UpdateFaqRequest) => {
   return result
 }
 
-export const getAllFaqs = async (userId: string, page: number) => {
+export const getAllFaqs = async (
+  userId: string,
+  page: number,
+  search: string
+) => {
   const userDepartmentId = await getUserDepartmentId(userId)
 
-  const faqs = await FaqRepository.getAllPublicFaqs(userDepartmentId, page)
+  const faqs = await FaqRepository.getAllPublicFaqs(
+    userDepartmentId,
+    page,
+    search
+  )
 
   return faqs
 }
 
-export const getDepartmentFaqs = async (userId: string, page: number) => {
+export const getDepartmentFaqs = async (
+  userId: string,
+  page: number,
+  search: string
+) => {
   const userDepartmentId = await getUserDepartmentId(userId)
 
-  const faqs = await FaqRepository.getAllDepartmentFaqs(userDepartmentId, page)
+  const faqs = await FaqRepository.getAllDepartmentFaqs(
+    userDepartmentId,
+    page,
+    search
+  )
 
   return faqs
 }
@@ -163,4 +179,21 @@ export const deleteSubFaq = async (subFaqId: string, userId: string) => {
     throw new Error('Faq not in your department')
 
   await FaqRepository.deleteSubFaqById(subFaqId)
+}
+
+export const deleteFaq = async (faqId: string, userId: string) => {
+  const user = await getUserById(userId)
+
+  const faq = await FaqRepository.getFaqById(faqId)
+  if (!faq) throw new Error('Faq not found')
+
+  const departmentId =
+    user?.staff?.staffDepartments[0]?.departmentId ||
+    user?.teacher?.teacherDepartments[0]?.departmentId
+  if (!departmentId) throw new Error('Staff no department')
+
+  if (user.role !== Role.ADMIN && faq.departmentId !== departmentId)
+    throw new Error('Faq not in your department')
+
+  await FaqRepository.deleteFaqById(faqId)
 }

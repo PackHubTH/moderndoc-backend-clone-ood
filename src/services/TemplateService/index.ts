@@ -33,7 +33,8 @@ export const GetDepartmentTemplates = async (
 
   const templates = await TemplateRepo.getDepartmentTemplates(
     departmentId,
-    params.page
+    params.page,
+    params.search
   )
 
   return templates

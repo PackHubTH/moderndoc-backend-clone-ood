@@ -41,17 +41,46 @@ export const getTemplateById = async (id: string) => {
 
 export const getDepartmentTemplates = async (
   departmentId: string,
-  page: number = 1
+  page: number = 1,
+  search: string
 ) => {
   const totalTemplatesCount = await prisma.template.count({
     where: {
-      departmentId,
+      AND: {
+        departmentId,
+        OR: [
+          {
+            title: {
+              contains: search,
+            },
+          },
+          {
+            description: {
+              contains: search,
+            },
+          },
+        ],
+      },
     },
   })
   const totalPages = Math.ceil(totalTemplatesCount / 10)
   const templates = await prisma.template.findMany({
     where: {
-      departmentId,
+      AND: {
+        departmentId,
+        OR: [
+          {
+            title: {
+              contains: search,
+            },
+          },
+          {
+            description: {
+              contains: search,
+            },
+          },
+        ],
+      },
     },
     skip: (page - 1) * 10,
     take: 10,
