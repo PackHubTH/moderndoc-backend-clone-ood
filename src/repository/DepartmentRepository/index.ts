@@ -1,5 +1,5 @@
 import prisma from '@prisma'
-import { Department } from '@prisma/client'
+import { ApprovalStatus, Department } from '@prisma/client'
 
 export const getDepartmentsByFacultyId = async (
   facultyId: string
@@ -74,7 +74,9 @@ export const getDepartmentMembers = async (
       OR: [
         {
           student: {
-            isApproved,
+            isApproved: isApproved
+              ? ApprovalStatus.APPROVED
+              : ApprovalStatus.PENDING,
             course: {
               departmentId: departmentId,
             },
@@ -85,7 +87,9 @@ export const getDepartmentMembers = async (
             staffDepartments: {
               some: {
                 departmentId,
-                isApproved,
+                isApproved: isApproved
+                  ? ApprovalStatus.APPROVED
+                  : ApprovalStatus.PENDING,
               },
             },
           },
@@ -95,7 +99,9 @@ export const getDepartmentMembers = async (
             teacherDepartments: {
               some: {
                 departmentId,
-                isApproved,
+                isApproved: isApproved
+                  ? ApprovalStatus.APPROVED
+                  : ApprovalStatus.PENDING,
               },
             },
           },
@@ -110,7 +116,9 @@ export const getDepartmentMembers = async (
       OR: [
         {
           student: {
-            isApproved,
+            isApproved: isApproved
+              ? ApprovalStatus.APPROVED
+              : ApprovalStatus.PENDING,
             course: {
               departmentId: departmentId,
             },
@@ -121,7 +129,9 @@ export const getDepartmentMembers = async (
             staffDepartments: {
               some: {
                 departmentId,
-                isApproved,
+                isApproved: isApproved
+                  ? ApprovalStatus.APPROVED
+                  : ApprovalStatus.PENDING,
               },
             },
           },
@@ -131,7 +141,9 @@ export const getDepartmentMembers = async (
             teacherDepartments: {
               some: {
                 departmentId,
-                isApproved,
+                isApproved: isApproved
+                  ? ApprovalStatus.APPROVED
+                  : ApprovalStatus.PENDING,
               },
             },
           },
@@ -170,74 +182,43 @@ export const approveStudentMember = async (
   studentId: string,
   isApproved: boolean
 ) => {
-  if (isApproved) {
-    const student = await prisma.student.update({
-      where: {
-        id: studentId,
-      },
-      data: {
-        isApproved: true,
-      },
-    })
+  const student = await prisma.student.update({
+    where: {
+      id: studentId,
+    },
+    data: {
+      isApproved: isApproved
+        ? ApprovalStatus.APPROVED
+        : ApprovalStatus.REJECTED,
+    },
+  })
 
-    return student
-  }
-
-  if (!isApproved) {
-    const student = await prisma.student.update({
-      where: {
-        id: studentId,
-      },
-      data: {
-        isApproved: false,
-        courseId: null,
-      },
-    })
-
-    return student
-  }
+  return student
 }
 export const approveStaffMember = async (
   staffId: string,
   departmentId: string,
   isApproved: boolean
 ) => {
-  if (isApproved) {
-    const staffDepartment = await prisma.staffDepartment.findFirst({
-      where: {
-        departmentId,
-        staffId: staffId,
-      },
-    })
+  const staffDepartment = await prisma.staffDepartment.findFirst({
+    where: {
+      departmentId,
+      staffId: staffId,
+    },
+  })
 
-    const updatedStaffDepartment = await prisma.staffDepartment.update({
-      where: {
-        id: staffDepartment?.id,
-      },
-      data: {
-        isApproved: true,
-      },
-    })
+  const updatedStaffDepartment = await prisma.staffDepartment.update({
+    where: {
+      id: staffDepartment?.id,
+    },
+    data: {
+      isApproved: isApproved
+        ? ApprovalStatus.APPROVED
+        : ApprovalStatus.REJECTED,
+    },
+  })
 
-    return updatedStaffDepartment
-  }
-
-  if (!isApproved) {
-    const staffDepartment = await prisma.staffDepartment.findFirst({
-      where: {
-        departmentId,
-        staffId: staffId,
-      },
-    })
-
-    const updatedStaffDepartment = await prisma.staffDepartment.delete({
-      where: {
-        id: staffDepartment?.id,
-      },
-    })
-
-    return updatedStaffDepartment
-  }
+  return updatedStaffDepartment
 }
 
 export const approveTeacherMember = async (
@@ -245,40 +226,23 @@ export const approveTeacherMember = async (
   departmentId: string,
   isApproved: boolean
 ) => {
-  if (isApproved) {
-    const teacherDepartment = await prisma.teacherDepartment.findFirst({
-      where: {
-        departmentId,
-        teacherId: teacherId,
-      },
-    })
+  const teacherDepartment = await prisma.teacherDepartment.findFirst({
+    where: {
+      departmentId,
+      teacherId: teacherId,
+    },
+  })
 
-    const updatedTeacherDepartment = await prisma.teacherDepartment.update({
-      where: {
-        id: teacherDepartment?.id,
-      },
-      data: {
-        isApproved: true,
-      },
-    })
+  const updatedTeacherDepartment = await prisma.teacherDepartment.update({
+    where: {
+      id: teacherDepartment?.id,
+    },
+    data: {
+      isApproved: isApproved
+        ? ApprovalStatus.APPROVED
+        : ApprovalStatus.REJECTED,
+    },
+  })
 
-    return updatedTeacherDepartment
-  }
-
-  if (!isApproved) {
-    const teacherDepartment = await prisma.teacherDepartment.findFirst({
-      where: {
-        departmentId,
-        teacherId: teacherId,
-      },
-    })
-
-    const updatedTeacherDepartment = await prisma.teacherDepartment.delete({
-      where: {
-        id: teacherDepartment?.id,
-      },
-    })
-
-    return updatedTeacherDepartment
-  }
+  return updatedTeacherDepartment
 }

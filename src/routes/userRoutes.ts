@@ -1,4 +1,5 @@
 import {
+  changeDepartment,
   getTeachersByName,
   getUser,
   getUsersByDepartmentId,
@@ -8,7 +9,6 @@ import {
   registerTeacher,
   updatedUser,
 } from 'controllers/UserController'
-
 import Router from 'express'
 import { validateToken } from 'middlewares/validateToken'
 
@@ -26,6 +26,7 @@ user.post('/staff', registerStaff)
 user.post('/teacher', registerTeacher)
 user.get('/teacher', getTeachersByName)
 
+user.put('/department', validateToken, changeDepartment)
 user.get('/department/:id', validateToken, getUsersByDepartmentId)
 
 export default user

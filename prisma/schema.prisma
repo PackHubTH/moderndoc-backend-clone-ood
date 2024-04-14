@@ -77,15 +77,15 @@ model User {
 }
 
 model Student {
-  id            String   @id @default(uuid())
-  userId        String   @unique @map("user_id")
-  courseId      String?  @map("course_id")
-  advisorId     String?  @map("advisor_id")
-  studentNumber String   @unique @map("student_number")
-  isApproved    Boolean  @default(false) @map("is_approved")
-  advisor       Teacher? @relation(fields: [advisorId], references: [id])
-  course        Course?  @relation(fields: [courseId], references: [id])
-  user          User     @relation(fields: [userId], references: [id])
+  id            String         @id @default(uuid())
+  userId        String         @unique @map("user_id")
+  courseId      String?        @map("course_id")
+  advisorId     String?        @map("advisor_id")
+  studentNumber String         @unique @map("student_number")
+  isApproved    ApprovalStatus @default(PENDING) @map("is_approved")
+  advisor       Teacher?       @relation(fields: [advisorId], references: [id])
+  course        Course?        @relation(fields: [courseId], references: [id])
+  user          User           @relation(fields: [userId], references: [id])
 
   @@map("student")
 }
@@ -102,12 +102,12 @@ model Teacher {
 }
 
 model TeacherDepartment {
-  id           String     @id @default(uuid())
-  teacherId    String     @map("teacher_id")
-  departmentId String     @map("department_id")
-  isApproved   Boolean    @default(false) @map("is_approved")
-  department   Department @relation(fields: [departmentId], references: [id])
-  teacher      Teacher    @relation(fields: [teacherId], references: [id])
+  id           String         @id @default(uuid())
+  teacherId    String         @map("teacher_id")
+  departmentId String         @map("department_id")
+  isApproved   ApprovalStatus @default(PENDING) @map("is_approved")
+  department   Department     @relation(fields: [departmentId], references: [id])
+  teacher      Teacher        @relation(fields: [teacherId], references: [id])
 
   @@map("teacher_department")
 }
@@ -124,12 +124,12 @@ model Staff {
 }
 
 model StaffDepartment {
-  id           String     @id @default(uuid())
-  staffId      String     @map("staff_id")
-  departmentId String     @map("department_id")
-  isApproved   Boolean    @default(false) @map("is_approved")
-  department   Department @relation(fields: [departmentId], references: [id])
-  staff        Staff      @relation(fields: [staffId], references: [id])
+  id           String         @id @default(uuid())
+  staffId      String         @map("staff_id")
+  departmentId String         @map("department_id")
+  isApproved   ApprovalStatus @default(PENDING) @map("is_approved")
+  department   Department     @relation(fields: [departmentId], references: [id])
+  staff        Staff          @relation(fields: [staffId], references: [id])
 
   @@map("staff_department")
 }
@@ -274,6 +274,14 @@ model DocumentSent {
 
   @@unique([documentId, receiverId, sendAt])
   @@map("document_sent")
+}
+
+enum ApprovalStatus {
+  APPROVED
+  PENDING
+  REJECTED
+
+  @@map("approvalStatus")
 }
 
 enum SendDocumentChannel {

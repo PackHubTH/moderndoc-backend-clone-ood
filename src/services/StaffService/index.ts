@@ -57,9 +57,21 @@ export const updateStaff = async (params: UpdateUserParams) => {
     staff.staffDepartments[0].id !== params.staff.staffDepartments[0].id
 
   if (isDepartmentChanged) {
-    await StaffRepository.deleteAllStaffDepartment(staff.id)
-    await StaffRepository.addStaffDepartment(staff.id, [
-      params.staff.staffDepartments[0].id,
-    ])
+    await changeDepartment(
+      staff.userId,
+      params.staff.staffDepartments[0].departmentId
+    )
   }
+}
+
+export const changeDepartment = async (
+  userId: string,
+  departmentId: string
+) => {
+  const staff = await StaffRepository.getStaffByUserId(userId)
+
+  if (!staff) throw new Error('Staff not found')
+
+  await StaffRepository.deleteAllStaffDepartment(staff.id)
+  await StaffRepository.addStaffDepartment(staff.id, [departmentId])
 }

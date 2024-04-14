@@ -1,28 +1,29 @@
-import * as StaffRepository from './../../repository/StaffRepository/index'
-import * as TeacherRepository from './../../repository/TeacherRepository/index'
-import * as UserRepository from './../../repository/UserRepository/index'
+import { Role, User } from '@prisma/client'
+import { Request, Response } from 'express'
+import { StatusCodes } from 'http-status-codes'
+import { ApiResponse } from 'models/response'
+import { getUserByEmail } from 'repository/UserRepository'
+import { addStaff, updateStaff } from 'services/StaffService'
+import { addStudent, updateStudent } from 'services/StudentService'
+import { addTeacher, updateTeacher } from 'services/TeacherService'
+import { getUserById } from 'services/UserService'
+import { generateToken } from 'utils/authUtils'
+import { getIsUserFinishedRegister } from 'utils/userUtils'
+import z from 'zod'
 
+import * as TeacherRepository from './../../repository/TeacherRepository'
+import * as UserRepository from './../../repository/UserRepository'
+import * as StaffService from './../../services/StaffService'
+import * as TeacherService from './../../services/TeacherService'
 import {
-  RegisterResponse,
+  changeDepartmentRequestSchema,
   getUserSchema,
   loginSchema,
+  RegisterResponse,
   registerStaffSchema,
   registerStudentSchema,
   updateUserSchema,
 } from './types'
-import { Request, Response } from 'express'
-import { addStaff, updateStaff } from 'services/StaffService'
-import { addStudent, updateStudent } from 'services/StudentService'
-import { addTeacher, updateTeacher } from 'services/TeacherService'
-
-import { ApiResponse } from 'models/response'
-import { StatusCodes } from 'http-status-codes'
-import { User } from '@prisma/client'
-import { generateToken } from 'utils/authUtils'
-import { getIsUserFinishedRegister } from 'utils/userUtils'
-import { getUserByEmail } from 'repository/UserRepository'
-import { getUserById } from 'services/UserService'
-import z from 'zod'
 
 export const registerStudent = async (req: Request, res: Response) => {
   try {
@@ -184,13 +185,13 @@ export const updatedUser = async (req: Request, res: Response) => {
   try {
     const request = await updateUserSchema.parseAsync(req.body)
     switch (request.role) {
-      case 'STUDENT':
+      case Role.STUDENT:
         await updateStudent(request)
         break
-      case 'TEACHER':
+      case Role.TEACHER:
         await updateTeacher(request)
         break
-      case 'STAFF':
+      case Role.STAFF:
         await updateStaff(request)
         break
     }
@@ -201,6 +202,43 @@ export const updatedUser = async (req: Request, res: Response) => {
       error: null,
     }
 
+    return res.status(StatusCodes.OK).json(response)
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Invalid request body',
+      error: error,
+    }
+    return res.status(StatusCodes.BAD_REQUEST).json(response)
+  }
+}
+
+export const changeDepartment = async (req: Request, res: Response) => {
+  try {
+    const { userId, departmentId } =
+      await changeDepartmentRequestSchema.parseAsync({
+        ...req.headers,
+        ...req.body,
+      })
+
+    const user = await getUserById(userId)
+
+    switch (user?.role) {
+      case Role.TEACHER:
+        await TeacherService.changeDepartment(userId, departmentId)
+        break
+      case Role.STAFF:
+        await StaffService.changeDepartment(userId, departmentId)
+        break
+      default:
+        throw new Error('Invalid role')
+    }
+
+    const response: ApiResponse<null> = {
+      data: null,
+      message: 'Successfully changed department',
+      error: null,
+    }
     return res.status(StatusCodes.OK).json(response)
   } catch (error) {
     const response: ApiResponse<null> = {

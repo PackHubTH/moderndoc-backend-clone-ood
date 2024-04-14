@@ -54,11 +54,24 @@ export const updateTeacher = async (params: UpdateUserParams) => {
     params.teacher.teacherDepartments[0].departmentId
 
   if (isDepartmentChanged) {
-    await TeacherRepository.deleteAllTeacherDepartment(teacher.id)
-    await TeacherRepository.addTeacherDepartment(teacher.id, [
-      params.teacher.teacherDepartments[0].departmentId,
-    ])
+    await changeDepartment(
+      params.user.id,
+      params.teacher.teacherDepartments[0].departmentId
+    )
   }
 
   return result
+}
+
+export const changeDepartment = async (
+  userId: string,
+  departmentId: string
+) => {
+  const teacher = await TeacherRepository.getTeacherByUserId(userId)
+
+  if (!teacher) throw new Error('Teacher not found')
+
+  const teacherId = teacher.id
+  await TeacherRepository.deleteAllTeacherDepartment(teacherId)
+  await TeacherRepository.addTeacherDepartment(teacherId, [departmentId])
 }

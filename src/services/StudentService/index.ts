@@ -1,4 +1,4 @@
-import { Student, User } from '@prisma/client'
+import { ApprovalStatus, Student, User } from '@prisma/client'
 import {
   RegisterStudentParams,
   UpdateUserParams,
@@ -57,7 +57,7 @@ export const updateStudent = async (params: UpdateUserParams) => {
     ...student,
     advisorId: params.student.advisorId,
     courseId: params.student.courseId,
-    isApproved: isCourseChanged ? false : student.isApproved,
+    isApproved: isCourseChanged ? ApprovalStatus.PENDING : student.isApproved,
   }
 
   const result = await StudentRepository.updateStudent(updatedStudent)

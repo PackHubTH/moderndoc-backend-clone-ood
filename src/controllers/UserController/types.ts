@@ -89,3 +89,8 @@ export type UpdateUserParams = z.infer<typeof updateUserSchema>
 export const getUserSchema = z.object({
   userId: z.string().uuid(),
 })
+
+export const changeDepartmentRequestSchema = z.object({
+  userId: z.string().uuid(),
+  departmentId: z.string().uuid(),
+})
